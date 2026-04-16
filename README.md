@@ -1,5 +1,5 @@
 # openLUXbox
-## DIY-Coop-Open-Source-**Spielekonsole**
+## DIY-Open-Source-Coop-**Spielekonsole**
 ### Bauanleitung, 3D-Dateien, Dokumentation
 
 *openLUXbox ist eine offene DIY-Spielekonsole für unter 40€ – gebaut zum Spielen, gedacht zum Weitermachen.*
