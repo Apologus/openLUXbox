@@ -7,3 +7,5 @@ Die Links sind *keine* affiliate links. Die "teureren" Komponenten stammen von A
 - **USB-C-Buchsen** bei [Amazon](https://www.amazon.de/dp/B0F1MJVBT7?ref=ppx_yo2ov_dt_b_fed_asin_title).
 - **Micro-USB-Anschlusskabel** bei [Amazon](https://www.amazon.de/dp/B0CWP1MCS9?ref=ppx_yo2ov_dt_b_fed_asin_title&th=1).
 - **Push Buttons**: bei [Amazon](https://www.amazon.de/Momentary-Schalter-2-poliger-selbstr%C3%BCckstellender-Rundschalter/dp/B09MBQSM44/258-8908585-9592724?pd_rd_w=vgpod&content-id=amzn1.sym.1dddd778-bde8-4d7b-a341-e3820071a00a&pf_rd_p=1dddd778-bde8-4d7b-a341-e3820071a00a&pf_rd_r=8Z1E9GX5NDY22AAR2KJY&pd_rd_wg=UDEdH&pd_rd_r=dd7eb650-3361-4e9c-8987-252ee766da72&pd_rd_i=B09MBQSM44&th=1).
+- **Widerstand 470 Ohm**: bei [Amazon](https://www.amazon.de/dp/B07BPK8V62?th=1).
+- **Kondensatoren 1000uF**: bei [Amazon](https://www.amazon.de/dp/B0CMQBD1C3?th=1).
