@@ -1,1 +1,196 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>openLUXbox Web–Flasher</title>
+  <script type="module" src="https://unpkg.com/esp-web-tools@9/dist/web/install-button.js"></script>
+  <style>
+    :root {
+      --bg:      #121212;
+      --surface: #1e1e1e;
+      --border:  #333;
+      --text:    #e0e0e0;
+      --sub:     #888;
+      --accent:  #4fc3f7;
+    }
 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 16px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .logo-wrap {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .logo-wrap img {
+      width: 440px;
+      max-width: 100%;
+      height: auto;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      color: var(--accent);
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    p {
+      color: var(--sub);
+      font-size: 0.95rem;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #2a2a2a;
+      color: var(--text);
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+
+    esp-web-install-button {
+      display: block;
+      margin-bottom: 16px;
+    }
+
+    .hint {
+      font-size: 0.78rem;
+      color: var(--sub);
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    .powered-by {
+      font-size: 0.78rem;
+      color: var(--sub);
+      text-align: center;
+      margin-top: 14px;
+    }
+
+    .powered-by a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    details {
+      margin-top: 28px;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+
+    summary {
+      cursor: pointer;
+      font-size: 0.82rem;
+      color: var(--sub);
+      list-style: none;
+      text-align: center;
+    }
+
+    summary::-webkit-details-marker { display: none; }
+    summary::before { content: "▸ "; }
+    details[open] summary::before { content: "▾ "; }
+
+    .impressum {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: var(--sub);
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    .impressum a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+
+    <div class="logo-wrap">
+      <img src="openLUXbox.png" alt="openLUXbox Logo">
+    </div>
+
+    <h1>Web–Flasher</h1>
+    <p>Firmware auswählen · openLUXbox per USB verbinden · Flashen</p>
+
+    <label for="firmware-select">Firmware auswählen:</label>
+    <select id="firmware-select" onchange="updateFlashButton()">
+      <option value="">– bitte wählen –</option>
+                <option value="firmware/4pong_esp8266.json">4pong_esp8266</option>
+                <option value="firmware/frog_esp8266.json">frog_esp8266</option>
+                <option value="firmware/lux_esp8266.json">lux_esp8266</option>
+                <option value="firmware/nano_hexagon_esp8266.json">nano_hexagon_esp8266</option>
+    </select>
+
+    <esp-web-install-button id="install-btn" style="display:none"></esp-web-install-button>
+
+    <p class="hint">⚠️ Nur in Chrome / Edge verfügbar &nbsp;·&nbsp; USB-Verbindung erforderlich</p>
+
+    <p class="powered-by">
+      Realisiert mit <a href="https://esphome.github.io/esp-web-tools/" target="_blank" rel="noopener">ESP Web Tools</a>
+    </p>
+
+    <details>
+      <summary>Impressum</summary>
+      <div class="impressum">
+        <strong>Angaben gemäß § 5 TMG</strong><br>
+        Jochen Wilke<br>
+        Ringstraße 16<br>
+        63546 Hammersbach<br><br>
+        <strong>Kontakt</strong><br>
+        <a href="mailto:openLUXbox@gmx.de">openLUXbox@gmx.de</a><br><br>
+        <em>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:</em><br>
+        Jochen Wilke, Ringstraße 16, 63546 Hammersbach
+      </div>
+    </details>
+
+  </div>
+
+  <script>
+    function updateFlashButton() {
+      const sel = document.getElementById('firmware-select');
+      const btn = document.getElementById('install-btn');
+      if (sel.value) {
+        btn.setAttribute('manifest', sel.value);
+        btn.style.display = 'block';
+      } else {
+        btn.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
