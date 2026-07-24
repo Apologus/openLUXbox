@@ -1,0 +1,15 @@
+{
+  "name": "4pong_esp8266",
+  "version": "1.0",
+  "builds": [
+    {
+      "chipFamily": "ESP8266",
+      "parts": [
+        {
+          "path": "4pong_esp8266.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}
