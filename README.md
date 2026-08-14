@@ -2,6 +2,8 @@
 ## DIY-Open-Source-Coop-**Spielekonsole**
 ### Bauanleitung, 3D-Dateien, Dokumentation
 
+#### ***Aktuell: Workshop zum Bau einer eigenen openLUXbox auf der Retrolution in Hanau!***
+
 *openLUXbox ist eine offene DIY-Spielekonsole für unter 40€ – gebaut zum Spielen, gedacht zum Weitermachen.*
 
 Die openLUXbox wurde durch das *WLED Project* und das *Open LED Race Project* inspiriert. Die Grundidee besteht darin, eine einfache DIY-Hardware als Basis für **kooperative Spiele** zu nutzen. Die Steuerung erfolgt über vier integrierte Push-Buttons.
