@@ -1,8 +1,8 @@
 # openLUXbox
 ## DIY-Open-Source-Coop-**Spielekonsole**
 ### Bauanleitung, 3D-Dateien, Dokumentation
-
-#### ***Aktuell: Workshop zum Bau einer eigenen openLUXbox auf der Retrolution in Hanau!***
+> [!TIP]
+> Aktuell: [Workshop](https://forum.homecon.org/index.php?thread/4013-bastelworkshop-bau-einer-openluxbox-spielekonsole/) zum Bau einer eigenen openLUXbox auf der [Retrolution](https://forum.homecon.org/index.php?thread/3925-homecon-90-retrolution-2026-laberecke/) in Hanau!
 
 *openLUXbox ist eine offene DIY-Spielekonsole für unter 40€ – gebaut zum Spielen, gedacht zum Weitermachen.*
 
