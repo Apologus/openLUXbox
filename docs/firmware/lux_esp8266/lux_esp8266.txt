@@ -1,0 +1,5 @@
+Lux
+Das Spiel, das der openLUXbox seinen Namen gegeben hat.
+Sammelt mit dem grünen Spielpunkt den gelben Punkt ein. Vermeidet rote Barrieren!
+Mit jedem Button gebt Ihr dem Spielpunkt Schub von der eigenen Seite weg. So kann der Spielpunkt beschleunigt, gebremst und auch zum Stillstand gebracht werden. Ruht der Punkt, wird er dunkler. Ein Timer am Bildschirmrand begrenzt die Zeit pro Level.
+17 Level mit steigendem Schwierigkeitsgrad, 3 Leben pro Spiel.

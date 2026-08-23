@@ -1,0 +1,2 @@
+4Pong
+Ein kooperativer Pong-Klon für 4 Spieler*innen. Jeder Button bewegt zwei Schläger in die eigene Richtung.

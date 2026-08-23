@@ -1,0 +1,15 @@
+{
+  "name": "nano_hexagon_esp8266",
+  "version": "1.0",
+  "builds": [
+    {
+      "chipFamily": "ESP8266",
+      "parts": [
+        {
+          "path": "nano_hexagon_esp8266.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}
