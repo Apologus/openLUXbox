@@ -9,6 +9,7 @@
     :root {
       --bg:      #121212;
       --surface: #1e1e1e;
+      --card-sub:#252525;
       --border:  #333;
       --text:    #e0e0e0;
       --sub:     #888;
@@ -56,7 +57,7 @@
       margin-bottom: 18px;
     }
 
-    p {
+    p.subtitle {
       color: var(--sub);
       font-size: 0.95rem;
       text-align: center;
@@ -79,6 +80,45 @@
       color: var(--text);
       font-size: 1rem;
       margin-bottom: 20px;
+    }
+
+    /* Detailbereich für Screenshot & Beschreibung */
+    .preview-card {
+      display: none;
+      background: var(--card-sub);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px 16px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .preview-headline {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--accent);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .preview-img-wrap {
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .preview-img-wrap img {
+      max-width: 100%;
+      max-height: 240px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      object-fit: contain;
+    }
+
+    .preview-description {
+      font-size: 0.88rem;
+      color: #ccc;
+      line-height: 1.5;
+      white-space: pre-wrap;
     }
 
     esp-web-install-button {
@@ -145,16 +185,27 @@
     </div>
 
     <h1>Web–Flasher</h1>
-    <p>Firmware auswählen · openLUXbox per USB verbinden · Flashen</p>
+    <p class="subtitle">Firmware auswählen · openLUXbox per USB verbinden · Flashen</p>
 
-    <label for="firmware-select">Firmware auswählen:</label>
-    <select id="firmware-select" onchange="updateFlashButton()">
+    <label for="firmware-select">Firmware / Spiel auswählen:</label>
+    <select id="firmware-select" onchange="onSelectionChanged()">
       <option value="">– bitte wählen –</option>
-                <option value="firmware/4pong_esp8266.json">4pong_esp8266</option>
-                <option value="firmware/frog_esp8266.json">frog_esp8266</option>
-                <option value="firmware/lux_esp8266.json">lux_esp8266</option>
-                <option value="firmware/nano_hexagon_esp8266.json">nano_hexagon_esp8266</option>
+        <option value="4pong_esp8266">4Pong</option>
+        <option value="frog_esp8266">Frog</option>
+        <option value="lux_esp8266">Lux</option>
+        <option value="nano_hexagon_esp8266">Nano Hexagon</option>
     </select>
+
+    <!-- Vorschau-Bereich mit zentraler Headline -->
+    <div id="preview-box" class="preview-card">
+      <div id="preview-headline" class="preview-headline"></div>
+      
+      <div id="preview-img-wrap" class="preview-img-wrap" style="display:none;">
+        <img id="preview-img" src="" alt="Screenshot">
+      </div>
+
+      <div id="preview-description" class="preview-description"></div>
+    </div>
 
     <esp-web-install-button id="install-btn" style="display:none"></esp-web-install-button>
 
@@ -181,14 +232,49 @@
   </div>
 
   <script>
-    function updateFlashButton() {
+    const fwData = {"4pong_esp8266": {"manifest": "firmware/4pong_esp8266/4pong_esp8266.json", "headline": "4Pong", "description": "Ein kooperativer Pong-Klon für 4 Spieler*innen. Jeder Button bewegt zwei Schläger in die eigene Richtung.", "screenshot": "firmware/4pong_esp8266/4pong_esp8266.jpg"}, "frog_esp8266": {"manifest": "firmware/frog_esp8266/frog_esp8266.json", "headline": "Frog", "description": "Steuert gemeinsam den Frosch zu den Fliegen am oberen Bildschirmrand. Ein kooperativer Frogger-Klon.", "screenshot": "firmware/frog_esp8266/frog_esp8266.jpg"}, "lux_esp8266": {"manifest": "firmware/lux_esp8266/lux_esp8266.json", "headline": "Lux", "description": "Das Spiel, das der openLUXbox seinen Namen gegeben hat.\nSammelt mit dem grünen Spielpunkt den gelben Punkt ein. Vermeidet rote Barrieren!\nMit jedem Button gebt Ihr dem Spielpunkt Schub von der eigenen Seite weg. So kann der Spielpunkt beschleunigt, gebremst und auch zum Stillstand gebracht werden. Ruht der Punkt, wird er dunkler. Ein Timer am Bildschirmrand begrenzt die Zeit pro Level.\n17 Level mit steigendem Schwierigkeitsgrad, 3 Leben pro Spiel.", "screenshot": "firmware/lux_esp8266/lux_esp8266.jpg"}, "nano_hexagon_esp8266": {"manifest": "firmware/nano_hexagon_esp8266/nano_hexagon_esp8266.json", "headline": "Nano Hexagon", "description": "Weicht den roten Balken aus! Ein kooperativer Klon von Hexagon.", "screenshot": "firmware/nano_hexagon_esp8266/nano_hexagon_esp8266.jpg"}};
+
+    function onSelectionChanged() {
       const sel = document.getElementById('firmware-select');
+      const val = sel.value;
       const btn = document.getElementById('install-btn');
-      if (sel.value) {
-        btn.setAttribute('manifest', sel.value);
+      const pBox = document.getElementById('preview-box');
+      const pHead = document.getElementById('preview-headline');
+      const pImgWrap = document.getElementById('preview-img-wrap');
+      const pImg = document.getElementById('preview-img');
+      const pDesc = document.getElementById('preview-description');
+
+      if (val && fwData[val]) {
+        const item = fwData[val];
+
+        // Flash-Button verknüpfen und anzeigen
+        btn.setAttribute('manifest', item.manifest);
         btn.style.display = 'block';
+
+        // Zentrale Headline setzen
+        pHead.textContent = item.headline || '';
+
+        // Screenshot aktualisieren
+        if (item.screenshot) {
+          pImg.src = item.screenshot;
+          pImgWrap.style.display = 'block';
+        } else {
+          pImgWrap.style.display = 'none';
+        }
+
+        // Fließtext setzen
+        if (item.description) {
+          pDesc.textContent = item.description;
+          pDesc.style.display = 'block';
+        } else {
+          pDesc.textContent = '';
+          pDesc.style.display = 'none';
+        }
+
+        pBox.style.display = 'block';
       } else {
         btn.style.display = 'none';
+        pBox.style.display = 'none';
       }
     }
   </script>
