@@ -1,0 +1,15 @@
+{
+  "name": "CanoLbalt",
+  "version": "1.0",
+  "builds": [
+    {
+      "chipFamily": "ESP8266",
+      "parts": [
+        {
+          "path": "canoLbalt_esp8266.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}
