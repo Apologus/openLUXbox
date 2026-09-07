@@ -7,13 +7,11 @@ Dieses Dokument beschreibt die Funktionen und Spezifikationen einer Spielekonsol
 ### 1.1 Microcontroller:
 
 D1 Mini NodeMcu mit ESP8266-12F
-(https://www.az-delivery.de/products/d1-mini)
 Treiber: "NodeMCU 1.0 (ESP-12E Module)" soll als Hinweis in jedem Code ganz oben stehen.
 
 ### 1.2 Display
 
 RGB LED Panel WS2812B 16x16 256 LEDs
-([https://www.az-delivery.de/products/rgb-led-panel-ws2812b-16x16-256-leds-flexibel-led-modul-5050smd-ic-einzeladressierbare-vollfarbfunktionen-mit-dc5v-kompatibel-mit-raspberry-pi?\_pos=6&\_sid=7159b8595&_ss=r](https://www.az-delivery.de/products/rgb-led-panel-ws2812b-16x16-256-leds-flexibel-led-modul-5050smd-ic-einzeladressierbare-vollfarbfunktionen-mit-dc5v-kompatibel-mit-raspberry-pi?_pos=6&_sid=7159b8595&_ss=r))
 
 Helligkeit: 20%
 Angesteuert über GPIO D4 mit FastLED.
