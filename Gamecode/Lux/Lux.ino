@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <FastLED.h>
-#include <LittleFS.h>
 #include <math.h>
 #include "olb_init_v1.h"
 
@@ -29,9 +28,10 @@ CRGB buttonColors[] = {
 
 // LED-Matrix Array (16x16)
 int ledMatrix[16][16];
+int matrixRotation = 0; // Rotation des Levels und des Timers 0, 1, 2 oder 3 (je 90°)
 
 // Geschwindigkeit in LEDs pro Sekunde
-const float SPEED_INCREMENT = 0.25;
+const float SPEED_INCREMENT = 0.5;
 float speedX = 0.0;
 float speedY = 0.0;
 
@@ -133,9 +133,357 @@ const int digit_9[5] = {
     0b11110000
 };
 
+// =============================================================================
+// BITMAP-RASTER IM FLASH (PROGMEM)
+// Farbcodes: 0:Schwarz, 1:Grün, 2:Gelb, 3:Rot, 6:Weiß, 7:Blau
+// =============================================================================
+
+// Screens
+const uint8_t PROGMEM SCREEN_SETUP[16][16] = {
+    {3,3,0,0,0,0,0,0,0,3,3,0,3,0,3,0},
+    {3,0,3,0,0,0,0,0,3,0,0,0,3,0,3,0},
+    {3,3,0,0,3,0,3,0,0,3,0,0,3,3,3,0},
+    {3,0,0,0,3,0,3,0,0,0,3,0,3,0,3,0},
+    {3,0,0,0,3,3,3,0,3,3,0,0,3,0,3,0},
+    {7,7,0,0,0,0,0,7,7,7,0,0,7,7,0,0},
+    {7,0,7,0,0,0,0,0,7,0,0,7,0,0,0,2},
+    {7,7,0,0,7,0,7,0,7,0,0,0,7,0,0,0},
+    {7,0,7,0,7,0,7,0,7,0,0,0,0,7,0,2},
+    {7,7,0,0,7,7,7,0,7,0,0,7,7,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,1,0,1,1,1,0,1,0,0,1,1,0,1,1,1},
+    {1,0,0,0,1,0,0,1,0,0,1,0,1,0,1,0},
+    {0,1,0,0,1,0,1,0,1,0,1,1,0,0,1,0},
+    {0,0,1,0,1,0,1,1,1,0,1,0,1,0,1,0},
+    {1,1,0,0,1,0,1,0,1,0,1,0,1,0,1,0}
+};
+
+const uint8_t PROGMEM SCREEN_GAMEOVER[16][16] = {
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,1,0,0,0,1,0,0,1,0,1,0,1,1,1,0},
+    {1,0,0,0,1,0,1,0,1,1,1,0,1,0,0,0},
+    {1,0,0,0,1,0,1,0,1,0,1,0,1,1,0,0},
+    {1,0,1,0,1,1,1,0,1,0,1,0,1,0,0,0},
+    {0,1,0,0,1,0,1,0,1,0,1,0,1,1,1,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,3,0,0,3,0,3,0,3,3,3,0,3,3,0},
+    {0,3,0,3,0,3,0,3,0,3,0,0,0,3,0,3},
+    {0,3,0,3,0,3,0,3,0,3,3,0,0,3,3,0},
+    {0,3,0,3,0,0,3,0,0,3,0,0,0,3,0,3},
+    {0,0,3,0,0,0,3,0,0,3,3,3,0,3,0,3},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+};
+
+const uint8_t PROGMEM SCREEN_LEVEL[16][16] = {
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    {1,0,0,0,1,0,0,1,0,1,0,0,1,0,0,1},
+    {1,0,0,1,1,1,0,1,0,1,0,1,1,1,0,1},
+    {1,0,0,1,0,0,0,1,0,1,0,1,0,0,0,1},
+    {1,1,0,0,1,1,0,0,1,0,0,0,1,1,0,1},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+};
+
+const uint8_t PROGMEM SCREEN_LIVES[16][16] = {
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,2,0,0,2,0,0,0,0,0,0,0,0,0,0,0},
+    {0,2,0,0,0,0,2,0,2,0,0,2,0,0,0,2},
+    {0,2,0,0,2,0,2,0,2,0,2,2,2,0,2,0},
+    {0,2,0,0,2,0,2,0,2,0,2,0,0,0,0,2},
+    {0,2,2,0,2,0,0,2,0,0,0,2,2,0,2,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+};
+
+const uint8_t PROGMEM SCREEN_PKT[16][16] = {
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,6,6,0,0,6,0,6,0,6,6,6,0,0,0},
+    {0,0,6,0,6,0,6,0,6,0,0,6,0,0,0,0},
+    {0,0,6,6,0,0,6,6,0,0,0,6,0,0,0,0},
+    {0,0,6,0,0,0,6,0,6,0,0,6,0,0,0,0},
+    {0,0,6,0,0,0,6,0,6,0,0,6,0,0,6,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+};
 
 
-std::vector<String> bmpFiles;  
+// Level 01 bis 10
+const uint8_t PROGMEM LEVELS[13][16][16] = {
+    {
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0},
+        {0,0,1,0,0,0,0,0,0,0,0,3,0,2,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+    },
+    // Level 02: Zwei vertikale Balken
+    {
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,3,0,0,0,0,0,0,0,0,3,0,0,0},
+        {0,2,0,3,0,0,0,0,0,0,0,0,3,0,0,0},
+        {0,0,0,3,0,0,0,0,0,0,0,0,3,0,0,0},
+        {0,0,0,3,0,0,0,0,0,0,0,0,3,0,0,0},
+        {0,0,0,3,0,0,0,0,0,0,0,0,3,0,1,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+    },
+
+    {
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,3,3,0,0,3,3,0,0,0,0,0},
+        {0,0,0,0,0,3,0,0,0,0,3,0,0,0,0,0},
+        {0,0,0,0,0,3,0,2,0,0,3,0,0,0,0,0},
+        {0,0,0,0,0,3,0,0,0,0,3,0,0,0,0,0},
+        {0,0,0,0,0,3,3,3,3,3,3,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+    },
+    // Level 04:
+    {
+        {3,0,0,0,3,0,0,2,0,0,3,0,0,0,3,0},
+        {3,0,0,0,3,0,0,0,0,0,3,0,0,0,3,0},
+        {0,3,0,3,0,0,0,0,0,0,0,3,0,3,0,0},
+        {0,3,0,3,0,0,0,0,0,0,0,3,0,3,0,0},
+        {0,0,3,0,0,0,0,0,0,0,0,0,3,0,0,0},
+        {0,0,3,0,0,0,0,0,0,0,0,0,3,0,0,0},
+        {0,0,0,0,0,3,0,0,0,3,0,0,0,0,0,0},
+        {0,0,0,0,0,3,0,0,0,3,0,0,0,0,0,0},
+        {0,0,0,0,0,0,3,0,3,0,0,0,0,0,0,0},
+        {0,0,3,0,0,0,3,0,3,0,0,0,3,0,0,0},
+        {0,0,3,0,0,0,0,3,0,0,0,0,3,0,0,0},
+        {0,3,0,3,0,0,0,3,0,0,0,3,0,3,0,0},
+        {0,3,0,3,0,0,0,0,0,0,0,3,0,3,0,0},
+        {3,0,0,0,3,0,0,0,0,0,3,0,0,0,3,0},
+        {3,0,0,0,3,0,0,0,0,0,3,0,0,0,3,0},
+        {0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0}
+    },
+    // Level 05:
+    {
+        {0,0,0,0,0,0,0,0,2,0,3,3,3,3,3,3},
+        {0,0,3,3,0,3,3,0,0,0,3,3,3,3,3,3},
+        {0,3,3,3,3,3,3,3,0,0,0,3,3,3,3,3},
+        {0,3,3,3,3,3,3,3,0,0,0,0,3,3,3,0},
+        {0,0,3,3,3,3,3,0,0,0,0,0,0,3,0,0},
+        {0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,3,3,0,3,3},
+        {0,3,3,0,3,3,0,0,0,0,3,3,3,3,3,3},
+        {3,3,3,3,3,3,3,0,0,0,3,3,3,3,3,3},
+        {3,3,3,3,3,3,3,0,0,0,0,3,3,3,3,3},
+        {0,3,3,3,3,3,0,0,0,0,0,0,3,3,3,0},
+        {0,0,3,3,3,0,0,0,0,0,0,0,0,3,0,0},
+        {0,1,0,3,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+    },
+    // Level 06:
+    {
+        {3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3},
+        {0,3,0,0,0,0,0,0,2,0,0,0,0,0,3,0},
+        {0,0,3,0,0,0,0,0,0,0,0,0,0,3,0,0},
+        {0,0,0,3,0,0,0,3,3,0,0,0,3,0,0,0},
+        {0,0,0,0,3,0,0,0,0,0,0,3,0,0,0,0},
+        {0,0,0,0,0,3,0,0,0,0,3,0,0,0,0,0},
+        {0,0,0,0,0,0,3,0,0,3,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,3,0,0,3,0,0,0,0,0,0},
+        {0,0,0,0,0,3,0,0,0,0,3,0,0,0,0,0},
+        {0,0,0,0,3,0,0,0,0,0,0,3,0,0,0,0},
+        {0,0,0,3,0,0,0,3,3,0,0,0,3,0,0,0},
+        {0,0,3,0,0,0,0,0,0,0,0,0,0,3,0,0},
+        {0,3,0,0,0,0,0,1,0,0,0,0,0,0,3,0},
+        {3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+    },
+    // Level 07:
+    {
+        {0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {3,0,3,0,3,0,3,0,3,0,3,0,3,0,3,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,3,0,3,0,3,0,3,0,3,0,3,0,3,0,3},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0},
+        {0,0,3,3,0,0,0,3,3,0,0,0,3,3,0,0},
+        {0,0,3,3,0,0,0,3,3,0,0,0,3,3,0,0},
+        {0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+    },
+    // Level 08:
+    {
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0},
+        {3,3,0,0,0,0,0,0,3,3,3,0,0,0,0,0},
+        {0,3,3,3,0,0,0,0,0,0,3,3,3,0,0,0},
+        {0,0,0,3,3,3,0,0,0,0,0,0,3,3,3,0},
+        {0,0,0,0,0,3,3,3,0,0,0,0,0,0,3,3},
+        {0,0,0,0,0,0,0,3,3,3,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,3,3,3,0,0,0,0},
+        {0,0,3,3,3,0,0,0,0,0,0,3,3,3,0,0},
+        {0,0,0,0,3,3,3,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,3,3,3,0,0,0,0,0,0,0},
+        {3,3,0,0,0,0,0,0,3,3,3,0,0,0,0,0},
+        {0,3,3,3,0,0,0,0,0,0,3,3,3,0,0,0},
+        {0,0,0,3,3,3,0,0,0,0,0,0,3,3,3,0},
+        {0,0,0,0,0,3,3,3,0,0,0,0,0,0,3,3},
+        {0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0}
+    },
+    // Level 09:
+    {
+        {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+        {3,0,0,0,0,0,0,0,0,3,3,0,0,0,0,3},
+        {3,0,2,0,0,0,0,0,0,3,0,0,0,3,0,3},
+        {3,0,0,0,0,0,3,0,0,3,0,0,0,3,0,3},
+        {3,0,0,0,0,0,3,0,0,0,0,0,3,3,0,3},
+        {3,0,0,0,0,3,3,0,0,0,0,0,3,0,0,3},
+        {3,0,0,0,0,3,0,0,0,3,0,0,3,0,0,3},
+        {3,0,3,0,0,3,0,0,0,3,0,0,0,0,0,3},
+        {3,0,3,0,0,0,0,0,3,3,0,0,0,0,0,3},
+        {3,3,3,0,0,0,0,0,3,0,0,0,3,0,0,3},
+        {3,3,0,0,0,3,0,0,3,0,0,0,3,0,0,3},
+        {3,3,0,0,0,3,0,0,0,0,0,3,3,0,0,3},
+        {3,0,0,0,3,3,0,0,0,0,0,3,0,0,0,3},
+        {3,0,0,0,3,0,0,0,3,0,0,3,0,0,0,3},
+        {3,0,0,0,3,0,0,0,3,0,0,0,0,0,0,3},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0}
+    },
+    // Level 10:
+    {
+        {3,3,0,0,3,3,0,0,3,3,0,0,3,3,0,2},
+        {3,3,0,0,3,3,0,0,3,3,0,0,3,3,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,3,3,0,0,3,3,0,0,3,3,0,0,3,3},
+        {0,0,3,3,0,0,3,3,0,0,3,3,0,0,3,3},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {3,3,0,0,3,3,0,0,3,3,0,0,3,3,0,0},
+        {3,3,0,0,3,3,0,0,3,3,0,0,3,3,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,3,3,0,0,3,3,0,0,3,3,0,0,3,3},
+        {1,0,3,3,0,0,3,3,0,0,3,3,0,0,3,3},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+    },
+    // Level 11:
+    {
+        {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+        {3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3},
+        {3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3},
+        {3,0,0,0,3,3,3,0,0,3,3,3,0,0,0,3},
+        {3,0,0,0,3,0,0,0,0,0,0,3,0,0,0,3},
+        {3,3,0,0,3,0,0,2,0,0,0,3,0,0,3,3},
+        {0,3,0,0,3,3,3,3,3,3,3,3,0,0,3,0},
+        {0,3,0,0,0,0,0,0,0,0,0,0,0,0,3,0},
+        {0,3,0,0,0,0,0,0,0,0,0,0,0,0,3,0},
+        {0,3,0,0,3,3,3,3,3,3,3,3,0,0,3,0},
+        {0,3,0,0,3,0,0,0,0,0,0,3,0,0,3,0},
+        {3,3,0,0,3,3,0,0,0,0,3,3,0,0,3,3},
+        {3,0,0,0,0,3,0,1,0,0,3,0,0,0,0,3},
+        {3,0,0,0,0,3,0,0,0,0,3,0,0,0,0,3},
+        {3,0,0,0,0,3,0,0,0,0,3,0,0,0,0,3},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+    },
+    // Level 12:
+    {
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,3,3,3,3,3,3,3,3,3,3,3,3,0,0},
+        {0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0},
+        {3,3,0,0,3,0,0,3,3,3,3,3,3,3,3,3},
+        {0,0,0,0,3,0,0,3,0,0,0,0,0,0,0,0},
+        {0,0,0,0,3,0,0,3,0,0,0,0,0,0,0,0},
+        {0,0,0,0,3,0,0,3,0,0,3,3,3,3,0,0},
+        {0,0,0,0,3,0,0,3,0,0,3,0,0,0,0,0},
+        {0,1,0,0,3,0,0,3,0,0,3,0,0,0,0,0},
+        {0,0,0,0,3,0,0,3,0,0,3,0,0,3,3,3},
+        {0,0,0,0,3,0,0,3,0,0,3,0,0,0,0,0},
+        {0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,0},
+        {0,0,0,0,3,3,3,3,3,3,3,3,3,3,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,2}
+    },
+    //Level 13:
+    {
+        {3,3,3,3,3,3,3,3,3,3,3,3,3,0,1,3},
+        {3,0,0,0,0,0,0,0,0,0,0,0,3,0,0,3},
+        {3,0,0,0,0,0,0,0,0,0,0,0,3,0,0,3},
+        {3,0,0,3,3,3,3,3,3,3,0,0,3,0,0,3},
+        {3,0,0,3,0,0,0,0,0,3,0,0,3,0,0,3},
+        {3,0,0,3,0,0,0,0,0,3,0,0,3,0,0,3},
+        {3,0,0,3,0,0,3,0,0,3,0,0,3,0,0,3},
+        {3,0,0,3,0,0,3,0,2,3,0,0,3,0,0,3},
+        {3,0,0,3,0,0,3,3,3,3,0,0,3,0,0,3},
+        {3,0,0,3,0,0,0,0,0,0,0,0,3,0,0,3},
+        {3,0,0,3,0,0,0,0,0,0,0,0,3,0,0,3},
+        {3,0,0,3,3,3,3,3,3,3,3,3,3,0,0,3},
+        {3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3},
+        {3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3},
+        {3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+    },
+};
 
 // Funktion zur Berechnung des Index in der Schlangenlinien-Reihenfolge
 int getIndexFromMatrix(int x, int y) {
@@ -155,8 +503,8 @@ void setMatrixColor(CRGB color) {
 // Tastendruck
 void waitForAnyButton() {
     while (digitalRead(BUTTON_1) == HIGH && digitalRead(BUTTON_2) == HIGH &&
-        digitalRead(BUTTON_3) == HIGH && digitalRead(BUTTON_4) == HIGH) {
-    delay(100);
+           digitalRead(BUTTON_3) == HIGH && digitalRead(BUTTON_4) == HIGH) {
+        delay(100);
     }
 }
 
@@ -206,123 +554,123 @@ void waitForAllButtons() {
 // Funktion zur Ausgabe des Matrix-Arrays auf die LED-Matrix
 void displayMatrix() {
     for (int y = 0; y < 16; y++) {
-        //Serial.println();
         for (int x = 0; x < 16; x++) {
             int index = getIndexFromMatrix(x, y);
             if (ledMatrix[x][y] == 0) {
                 leds[index] = CRGB::Black;
             } else if (ledMatrix[x][y] == 1) {
-                leds[index] = CRGB::Green;
-            }  else if (ledMatrix[x][y] == 2) {
+                if ((speedX == 0.0) && (speedY == 0.0)) {
+                    leds[index] = CRGB(0, 70, 0);   // dunkelgrün
+                } else {
+                    leds[index] = CRGB(0, 170, 0);  // hellgrün bei Bewegung
+                }
+            } else if (ledMatrix[x][y] == 2) {
                 leds[index] = CRGB::Yellow;
-            }  else if (ledMatrix[x][y] == 3) {
+            } else if (ledMatrix[x][y] == 3) {
                 leds[index] = CRGB::Red;
-            }  else if (ledMatrix[x][y] == 4) {
+            } else if (ledMatrix[x][y] == 4) {
                 leds[index] = CRGB::Orange;
-            }  else if (ledMatrix[x][y] == 5) {
+            } else if (ledMatrix[x][y] == 5) {
                 leds[index] = CRGB::Coral;
-            }  else if (ledMatrix[x][y] == 6) {
+            } else if (ledMatrix[x][y] == 6) {
                 leds[index] = CRGB::White;
-            }  else if (ledMatrix[x][y] == 7) {
+            } else if (ledMatrix[x][y] == 7) {
                 leds[index] = CRGB::Blue;
             }
-            //leds[index] = CRGB(ledMatrix[x][y] ? CRGB::Yellow : CRGB::Black);  // Gelb für 1, Schwarz für 0
         }
     }
     
     FastLED.show();
 }
 
-void explodeAt(int x, int y, int colors[], int groesse) {
-  
-  for (int r = 0; r < 5; r++) {
-    for (int dy = -r; dy <= r; dy++) {
-      for (int dx = -r; dx <= r; dx++) {
-        int newX = x + dx;
-        int newY = y + dy;
-        if (newX >= 0 && newX < 16 && newY >= 0 && newY < 16) {
-          int distance = abs(dx) + abs(dy);
-          if (distance <= r) {
-            ledMatrix[newX][newY] = colors[min(distance, 2)]; // 
-          }
+void explodeAt(int x, int y, int colors[]) {
+    for (int r = 0; r < 5; r++) {
+        for (int dy = -r; dy <= r; dy++) {
+            for (int dx = -r; dx <= r; dx++) {
+                int newX = x + dx;
+                int newY = y + dy;
+                if (newX >= 0 && newX < 16 && newY >= 0 && newY < 16) {
+                    int distance = abs(dx) + abs(dy);
+                    if (distance <= r) {
+                        ledMatrix[newX][newY] = colors[min(distance, 2)]; 
+                    }
+                }
+            }
         }
-      }
+        displayMatrix();
+        FastLED.delay(100);
     }
-    displayMatrix();
-    FastLED.delay(100);
-  }
   
-  for (int i = 0; i < 256; i += 51) {
-    for (int y = 0; y < 16; y++) {
-      for (int x = 0; x < 16; x++) {
-        ledMatrix[x][y] = 0;
-      }
+    for (int i = 0; i < 256; i += 51) {
+        for (int y = 0; y < 16; y++) {
+            for (int x = 0; x < 16; x++) {
+                ledMatrix[x][y] = 0;
+            }
+        }
+        displayMatrix();
+        FastLED.delay(50);
     }
-    displayMatrix();
-    FastLED.delay(50);
-  }
   
-  FastLED.clear();
-  FastLED.show();
+    FastLED.clear();
+    FastLED.show();
 }
 
-void loadBMP(String filename) {
-    Serial.println("Displaying: " + filename);
-
-    File bmpFile = LittleFS.open(filename, "r");
-    if (!bmpFile) {
-        Serial.println("Error opening BMP file.");
-        return;
-    }
-
-    // BMP header parsing
-    uint8_t header[54];
-    bmpFile.read(header, 54);
-    if (header[0] != 'B' || header[1] != 'M') {
-        Serial.println("Invalid BMP file.");
-        bmpFile.close();
-        return;
-    }
-
-    uint32_t pixelArrayOffset = *(uint32_t*)&header[10];
-    int width = *(int32_t*)&header[18];
-    int height = *(int32_t*)&header[22];
-
-    if (width != 16 || abs(height) != 16) {
-        Serial.println("BMP dimensions do not match matrix.");
-        bmpFile.close();
-        return;
-    }
-
-    bmpFile.seek(pixelArrayOffset);
-
+// Lädt einen Vollbild-Screen aus dem Flash (mit 15-x / 15-y Mapping wie im alten loadBMP)
+void loadScreen(const uint8_t screen[16][16]) {
     for (int y = 0; y < 16; y++) {
         for (int x = 0; x < 16; x++) {
-            uint8_t b = bmpFile.read();
-            uint8_t g = bmpFile.read();
-            uint8_t r = bmpFile.read();
-            if (b == 0 && g == 0 && r == 255) {
-                ledMatrix[15-x][15-y] = 3;
-            } else if (b == 0 && g == 255 && r == 0) { // Spielpunkt
-                ledMatrix[15-x][15-y] = 1;
-                posX = 15-x;
-                posY = 15-y;
-            } else if (b == 0 && g == 255 && r == 255) { // Snatch
-                ledMatrix[15-x][15-y] = 2;
-                targetX = 15-x;
-                targetY = 15-y;
-            } else if (b == 255 && g == 255 && r == 255) { // weiß
-                ledMatrix[15-x][15-y] = 6;
-            } else if (b == 255 && g == 0 && r == 0) { // blau
-                ledMatrix[15-x][15-y] = 7;
-            } else {
-                ledMatrix[15-x][15-y] = 0;  //alle anderen schwarz
+            ledMatrix[x][y] = pgm_read_byte(&(screen[y][15 - x]));
+        }
+    }
+}
+
+
+// Lädt ein Level aus dem Flash (mit 15-x / 15-y Mapping wie im alten loadBMP)
+void loadLevel(int levelIdx) {
+    int idx = (levelIdx - 1) % 13; // <-- HIER: auf 13 geändert!
+    if (idx < 0) idx = 0;
+    
+    for (int y = 0; y < 16; y++) {
+        for (int x = 0; x < 16; x++) {
+            uint8_t val = pgm_read_byte(&(LEVELS[idx][y][x]));
+            ledMatrix[15 - x][15 - y] = val;
+            if (val == 1) { // Spielpunkt
+                posX = 15 - x;
+                posY = 15 - y;
+            } else if (val == 2) { // Snatch
+                targetX = 15 - x;
+                targetY = 15 - y;
             }
         }
     }
-    bmpFile.close();
 }
 
+// dreht die Matrix / Level zufällig
+void rotateMatrixRandom() {
+    matrixRotation = random(4);
+    int temp[16][16];
+    float newPosX, newPosY;
+    int newTargetX, newTargetY;
+
+    for (int i = 0; i < matrixRotation; i++) {
+        for (int y = 0; y < 16; y++) {
+            for (int x = 0; x < 16; x++) {
+                temp[x][15 - y] = ledMatrix[y][x];
+            }
+        }
+        memcpy(ledMatrix, temp, sizeof(ledMatrix));
+
+        newPosX = posY;
+        newPosY = 15 - posX;
+        posX = newPosX;
+        posY = newPosY;
+
+        newTargetX = targetY;
+        newTargetY = 15 - targetX;
+        targetX = newTargetX;
+        targetY = newTargetY;
+    }
+}
 
 // Funktion zur Aktualisierung der Position des Punkts
 void updatePosition() {
@@ -352,19 +700,18 @@ void updatePosition() {
         speedY = 0;
     }
 
-
     currentX = round(posX);
     currentY = round(posY);
 
-    //Crash?
+    // Crash?
     if (ledMatrix[currentX][currentY] == 3) {
-        //rote Explosion zeichnen
-        int colors [3] = {2, 4, 3};
-        explodeAt(currentX, currentY, colors, 3);
+        // rote Explosion zeichnen
+        int colors[3] = {2, 4, 3};
+        explodeAt(currentX, currentY, colors);
         lives -= 1;
         if (lives == 0) {
             score = 0;
-            loadBMP("game_over.bmp");
+            loadScreen(SCREEN_GAMEOVER);
             displayMatrix();
             delay(500);
             waitForAnyButton();
@@ -381,25 +728,31 @@ void updatePosition() {
     if (currentX == targetX && currentY == targetY) {
         score++;  // Punkt erhöhen
         // grüne Explosion 
-        int colors [3] = {1, 5, 1};
-        explodeAt(currentX, currentY, colors, 3);
+        int colors[3] = {1, 5, 1};
+        explodeAt(currentX, currentY, colors);
         speedX = 0;
         speedY = 0;
     }
 
-    // Timer am unteren Rand
-    int timer = int((millis()-startTime) / timerSpeed);
+    // Timer an der rotierten Seite
+    int timer = int((millis() - startTime) / timerSpeed);
     for (int i = 0; i < timer; i++) {
-        ledMatrix[15-i][15] = 3;
+        switch (matrixRotation) {
+            case 0: ledMatrix[15 - i][0]  = 3; break; // oben, rechts nach links (vorher: unten)
+            case 1: ledMatrix[0][i]     = 3; break; // links, oben nach unten (vorher: rechts)
+            case 2: ledMatrix[i][15]    = 3; break; // unten, links nach rechts (vorher: oben)
+            case 3: ledMatrix[15][15 - i] = 3; break; // rechts, unten nach oben (vorher: links)
+        }
     }
+    
     if (timer == 16) {
-        //rote Explosion zeichnen
-        int colors [3] = {2, 4, 3};
-        explodeAt(currentX, currentY, colors, 3);
+        // rote Explosion zeichnen
+        int colors[3] = {2, 4, 3};
+        explodeAt(currentX, currentY, colors);
         lives -= 1;
         if (lives == 0) {
             score = 0;
-            loadBMP("game_over.bmp");            
+            loadScreen(SCREEN_GAMEOVER);            
             displayMatrix();
             waitForAnyButton();
         }
@@ -408,94 +761,13 @@ void updatePosition() {
         startTime = millis();
     }
 
-    
     // Matrix aktualisieren
     displayMatrix();
 }
 
-void loadRandomBMP() {
-    // List BMP files in LittleFS
-    Serial.println("Listing BMP files:");
-    Dir dir = LittleFS.openDir("/");
-    while (dir.next()) {
-        String fileName = dir.fileName();
-        //if (fileName.endsWith(".bmp")) {
-        bmpFiles.push_back(fileName);
-        Serial.println("Found: " + fileName);
-        //}
-    }
-
-    if (bmpFiles.empty()) {
-        Serial.println("No BMP files found in LittleFS.");
-        return;
-    }
-
-    randomSeed(analogRead(A0));
-    String filename = "1.bmp";
-    
-    // Display the first image
-    if (!bmpFiles.empty()) {
-        String selectedFile = bmpFiles[random(bmpFiles.size())];
-        Serial.println("Displaying: " + selectedFile);
-        filename = selectedFile;
-    }
-
-    File bmpFile = LittleFS.open(filename, "r");
-    if (!bmpFile) {
-        Serial.println("Error opening BMP file.");
-        return;
-    }
-
-    // BMP header parsing
-    uint8_t header[54];
-    bmpFile.read(header, 54);
-    if (header[0] != 'B' || header[1] != 'M') {
-        Serial.println("Invalid BMP file.");
-        bmpFile.close();
-        return;
-    }
-
-    uint32_t pixelArrayOffset = *(uint32_t*)&header[10];
-    int width = *(int32_t*)&header[18];
-    int height = *(int32_t*)&header[22];
-
-    if (width != 16 || abs(height) != 16) {
-        Serial.println("BMP dimensions do not match matrix.");
-        bmpFile.close();
-        return;
-    }
-
-    bmpFile.seek(pixelArrayOffset);
-
-    for (int y = 0; y < 16; y++) {
-        for (int x = 0; x < 16; x++) {
-            uint8_t b = bmpFile.read();
-            uint8_t g = bmpFile.read();
-            uint8_t r = bmpFile.read();
-            if (b == 0 && g == 0 && r == 255) {
-                ledMatrix[15-x][15-y] = 3;
-            } else if (b == 0 && g == 255 && r == 0) { // Spielpunkt
-                ledMatrix[15-x][15-y] = 1;
-                posX = 15-x;
-                posY = 15-y;
-            } else if (b == 0 && g == 255 && r == 255) { // Snatch
-                ledMatrix[15-x][15-y] = 2;
-                targetX = 15-x;
-                targetY = 15-y;
-            }
-        /*int mirroredX = WIDTH - 1 - x; // Mirror the x-coordinate
-        int index = height > 0 ? getIndex(mirroredX, HEIGHT - 1 - y) : getIndex(mirroredX, y);
-        matrix.setPixelColor(index, matrix.Color(r, g, b));*/
-        }
-    }
-
-    bmpFile.close();
-}
-
-
 // Zeigt die Anschlüsse
 void setupScreen() {
-    loadBMP("setup.bmp");
+    loadScreen(SCREEN_SETUP);
     displayMatrix();
     FastLED.show();
     waitForAnyButton();
@@ -504,7 +776,7 @@ void setupScreen() {
 
 // zeigt vor jedem Level die Level-Nummer
 void showLevel() {
-    loadBMP("level.bmp");
+    loadScreen(SCREEN_LEVEL);
 
     const int* digits[] = {digit_0, digit_1, digit_2, digit_3, digit_4, 
                            digit_5, digit_6, digit_7, digit_8, digit_9};
@@ -534,14 +806,12 @@ void showLevel() {
 
 // zeigt die verbliebenen Leben
 void showLives() {
-    loadBMP("lives.bmp");
-
+    loadScreen(SCREEN_LIVES);
 
     for (int i = 0; i < lives; i++) {
         for (int j = 0; j < 2; j++) {
             for (int k = 0; k < 2; k++) {
                 ledMatrix[4 + i * 3 + k][10 + j] = 1;
-                //Serial.println(5 + i * 2 + k);
             }
         }
     }
@@ -549,6 +819,7 @@ void showLives() {
     delay(500);
     waitForAnyButton();
 }
+
 void setup() {
     // LED-Setup
     Serial.begin(115200);
@@ -559,18 +830,11 @@ void setup() {
 
     FastLED.setBrightness(BRIGHTNESS);
 
-    // Initialize LittleFS
-    if (!LittleFS.begin()) {
-        Serial.println("Failed to initialize LittleFS.");
-        return;
-    }
-
     // Button-Pins als Eingang konfigurieren
     pinMode(BUTTON_1, INPUT_PULLUP);
     pinMode(BUTTON_2, INPUT_PULLUP);
     pinMode(BUTTON_3, INPUT_PULLUP);
     pinMode(BUTTON_4, INPUT_PULLUP);
-    pinMode(BUTTON_5, INPUT_PULLUP);
 
     // Initialisierung des LED-Matrix-Arrays
     memset(ledMatrix, 0, sizeof(ledMatrix));
@@ -578,13 +842,10 @@ void setup() {
     setupScreen();
 
     waitForAllButtons();
-    //loadRandomBMP();
-    // Matrix anzeigen
-
 }
 
 void loop() {
-    //Game over?
+    // Game over?
     if (lives == 0) {
         score = 0;
         lives = 3; 
@@ -594,8 +855,8 @@ void loop() {
     showLevel();
     showLives();
 
-    String filename = String(score + 1) + ".bmp";
-    loadBMP(filename);
+    loadLevel(score + 1);
+    rotateMatrixRandom();
     displayMatrix();
     delay(500);
 
@@ -603,20 +864,47 @@ void loop() {
     int oldLives = lives;
     startTime = millis();
 
+    int lastBtn1 = digitalRead(BUTTON_1);
+    int lastBtn2 = digitalRead(BUTTON_2);
+    int lastBtn3 = digitalRead(BUTTON_3);
+    int lastBtn4 = digitalRead(BUTTON_4);
+
+    unsigned long lastDebounceTime1 = 0;
+    unsigned long lastDebounceTime2 = 0;
+    unsigned long lastDebounceTime3 = 0;
+    unsigned long lastDebounceTime4 = 0;
+    const unsigned long DEBOUNCE_DELAY = 30; // 30 ms Sperrzeit laut TSD
+
     while (oldScore == score && oldLives == lives) {
-        // Überprüfen, ob ein Button gedrückt ist und Geschwindigkeit anpassen
-        if (digitalRead(BUTTON_1) == LOW) {
+        unsigned long currentMillis = millis();
+
+        int btn1 = digitalRead(BUTTON_1);
+        int btn2 = digitalRead(BUTTON_2);
+        int btn3 = digitalRead(BUTTON_3);
+        int btn4 = digitalRead(BUTTON_4);
+
+        // Überprüfen auf Tastendruck (Flanke HIGH -> LOW) mit Entprell-Sperrzeit
+        if (btn1 == LOW && lastBtn1 == HIGH && (currentMillis - lastDebounceTime1 > DEBOUNCE_DELAY)) {
             speedX -= SPEED_INCREMENT;
+            lastDebounceTime1 = currentMillis;
         }
-        if (digitalRead(BUTTON_2) == LOW) {
+        if (btn2 == LOW && lastBtn2 == HIGH && (currentMillis - lastDebounceTime2 > DEBOUNCE_DELAY)) {
             speedX += SPEED_INCREMENT;
+            lastDebounceTime2 = currentMillis;
         }
-        if (digitalRead(BUTTON_3) == LOW) {
+        if (btn3 == LOW && lastBtn3 == HIGH && (currentMillis - lastDebounceTime3 > DEBOUNCE_DELAY)) {
             speedY += SPEED_INCREMENT;
+            lastDebounceTime3 = currentMillis;
         }
-        if (digitalRead(BUTTON_4) == LOW) {
+        if (btn4 == LOW && lastBtn4 == HIGH && (currentMillis - lastDebounceTime4 > DEBOUNCE_DELAY)) {
             speedY -= SPEED_INCREMENT;
+            lastDebounceTime4 = currentMillis;
         }
+
+        lastBtn1 = btn1;
+        lastBtn2 = btn2;
+        lastBtn3 = btn3;
+        lastBtn4 = btn4;
         
         // Position aktualisieren und Matrix neu zeichnen
         updatePosition();
