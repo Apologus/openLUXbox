@@ -1,12 +1,9 @@
-#include <LittleFS.h>
-#include <loadBMP.h>
-#include "olb_init_v1.h"
-
 // NodeMCU 1.0 (ESP-12E Module)
 // 4Pong - openLUXbox
 
 #include <FastLED.h>
 #include <ESP8266WiFi.h>
+#include "olb_init_v1.h"
 
 // ============================================================
 // DEFINES / PARAMETER
@@ -47,6 +44,28 @@
 #define COL_MAGENTA    CRGB(255,80,255)
 
 // ============================================================
+// STARTBILDSCHIRM - FEST INTEGRIERTER HEXCODE
+// ============================================================
+const uint32_t PROGMEM SCREEN_START[16][16] = {
+    {0x4F2189, 0x4E2189, 0x4F2189, 0x4F2089, 0x4F2189, 0x4F2089, 0x4F218A, 0x4F218A, 0x4F218A, 0x4F218A, 0x4F218A, 0x50218B, 0x50218B, 0xF4F13A, 0x532390, 0x5D26A2},
+    {0x50218B, 0x50218B, 0x50218B, 0x50218B, 0x50218B, 0x51218C, 0x50228D, 0x51228E, 0x51228E, 0x52228E, 0x532290, 0x542291, 0xF4F13A, 0xF4F13A, 0x5C26A0, 0x652AB0},
+    {0x50218B, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x522290, 0x532391, 0x532291, 0x542392, 0x552394, 0xF4F13A, 0x58259A, 0xF4F13A, 0x6028A7, 0x672BB2},
+    {0x50218B, 0x000000, 0x52228F, 0x522291, 0x532391, 0x000000, 0x000000, 0x552493, 0x552495, 0x572496, 0xF4F13A, 0x5A259B, 0x5C26A0, 0xF4F13A, 0x6229AB, 0x672AB3},
+    {0x50218B, 0x000000, 0x532392, 0x542392, 0x542393, 0x552394, 0x000000, 0x562497, 0x572498, 0xF4F13A, 0x5A259C, 0x5C26A0, 0x5D27A3, 0xF4F13A, 0x6329AD, 0x672BB4},
+    {0x50218B, 0x000000, 0x542393, 0x552394, 0x562396, 0x572396, 0x000000, 0x582499, 0x59259B, 0xF4F13A, 0xF4F13A, 0xF4F13A, 0xF4F13A, 0xF4F13A, 0xF4F13A, 0x672BB4},
+    {0x50218B, 0x000000, 0x562396, 0x562496, 0x572497, 0x000000, 0x000000, 0x5A259C, 0x5A259D, 0x5B269F, 0x5C26A2, 0x5E27A5, 0x6027A8, 0xF4F13A, 0x652AB1, 0x682BB5},
+    {0x50218B, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x59259B, 0x5A269E, 0x5B26A0, 0x5C26A1, 0x5E27A4, 0x6028A6, 0x6129AA, 0xF4F13A, 0x662AB1, 0x672BB5},
+    {0x50218B, 0x000000, 0x572499, 0x58259A, 0x59259A, 0x5A259C, 0x5A259D, 0x5C269F, 0x5C26A2, 0x5D26A4, 0x5F27A6, 0x6028A8, 0x6229AB, 0x642AAE, 0x662AB1, 0x682BB5},
+    {0x50218B, 0x000000, 0x58259A, 0x59259C, 0x000000, 0x000000, 0x5C269F, 0x5D26A1, 0x000000, 0x000000, 0x000000, 0x6228AA, 0x6229AD, 0x000000, 0x000000, 0x000000},
+    {0x50218B, 0x000000, 0x5A259C, 0x000000, 0x5B259E, 0x5C269F, 0x000000, 0x5E26A2, 0x000000, 0x5F28A6, 0x000000, 0x6228AB, 0x000000, 0x6529B0, 0x662AB2, 0x000000},
+    {0x50218B, 0x000000, 0x5A269D, 0x000000, 0x5C26A0, 0x5C26A1, 0x000000, 0x5E27A4, 0x000000, 0x6027A8, 0x000000, 0x6329AC, 0x000000, 0x652AB1, 0x672BB3, 0x000000},
+    {0x5A259C, 0x5A269E, 0x5B269E, 0x5B269F, 0x000000, 0x000000, 0x5E27A3, 0x5F27A5, 0x000000, 0x6028A9, 0x000000, 0x6329AC, 0x642AAE, 0x000000, 0x000000, 0x000000},
+    {0x5B259E, 0x5B259E, 0x5B259F, 0x5C27A0, 0x5D26A2, 0x5E26A3, 0x5E27A4, 0x5F28A6, 0x6028A7, 0x6128A9, 0x6229AB, 0x6329AD, 0x6429AF, 0x652AB2, 0x662AB3, 0x000000},
+    {0x5B269E, 0x5B269F, 0x5C26A0, 0x5D27A2, 0x5D27A3, 0x5E27A4, 0x5F28A5, 0x5F28A7, 0x6128A8, 0x6229AA, 0x6329AB, 0x642AAE, 0x642AAF, 0x000000, 0x000000, 0x682BB5},
+    {0x5C269F, 0x5C26A0, 0x5C26A1, 0x5D27A3, 0x5E27A3, 0x5F27A5, 0x5F27A6, 0x6028A7, 0x6128A9, 0x6228AA, 0x6329AC, 0x642AAE, 0x652AB0, 0x662AB2, 0x672BB4, 0x682BB5}
+};
+
+// ============================================================
 // STRUCTS
 // ============================================================
 struct Button {
@@ -55,7 +74,6 @@ struct Button {
   bool pressed;
   unsigned long lastDebounce;
 };
-
 struct Paddle {
   int pos;
   int minPos;
@@ -79,7 +97,6 @@ bool isOnPaddle(int x, int y, int &paddleId, int &half);
 void reflectBall(int paddleId, int half);
 void fillGameOverPixels();
 CRGB randomColor();
-void drawChar(const uint8_t ch[4][5], int startX, int startY, CRGB color);
 
 // ============================================================
 // GLOBALE VARIABLEN
@@ -112,42 +129,8 @@ bool  gameOverScreenCleared;
 
 unsigned long lastFrameTime;
 
-// NEU: Verhindert sofortigen Start nach Boot
+// Verhindert sofortigen Start nach Boot
 bool startScreenJustShown = false;
-
-// ============================================================
-// FONT DATEN
-// ============================================================
-const uint8_t FONT_4[4][5] = {
-  {0,0,0,0,0},
-  {1,1,1,1,1},
-  {0,0,1,0,0},
-  {1,1,1,0,0}
-};
-const uint8_t FONT_P[4][5] = {
-  {0,0,0,0,0},
-  {1,1,1,0,0},
-  {1,0,1,0,0},
-  {1,1,1,1,1}
-};
-const uint8_t FONT_O[4][5] = {
-  {0,0,0,0,0},
-  {0,1,1,1,0},
-  {1,0,0,0,1},
-  {0,1,1,1,0}
-};
-const uint8_t FONT_N[4][5] = {
-  {1,1,1,1,1},
-  {0,0,1,0,0},
-  {0,1,0,0,0},
-  {1,1,1,1,1}
-};
-const uint8_t FONT_G[4][5] = {
-  {0,0,1,1,1},
-  {1,0,0,0,1},
-  {0,1,1,1,0},
-  {0,0,0,0,0}
-};
 
 // ============================================================
 // SETUP
@@ -174,24 +157,6 @@ void setup() {
   olb_v1_playIntro(leds);
 
   FastLED.setBrightness(BRIGHTNESS);
-
-  // LittleFS starten
-  if (!LittleFS.begin()) {
-    Serial.println("[4Pong] FEHLER: LittleFS konnte nicht gestartet werden!");
-  } else {
-    Serial.println("[4Pong] LittleFS bereit");
-  }
-
-  LittleFS.begin();
-
-  // Alle Dateien auflisten
-  Dir dir = LittleFS.openDir("/");
-  while (dir.next()) {
-      Serial.print("[FS] Datei: ");
-      Serial.print(dir.fileName());
-      Serial.print(" | Größe: ");
-      Serial.println(dir.fileSize());
-  }
 
   // Verbesserter Random Seed
   uint32_t seed = 0;
@@ -273,6 +238,7 @@ void loop() {
         Serial.println("[GAMEOVER] Screen geleert, starte Score-Animation");
       } else if (anyButtonPressed()) {
         Serial.println("[GAMEOVER] Taste gedrückt -> Startbildschirm");
+        delay(2000);
         showStartScreen();
         gameState = STATE_START;
         // Auch hier: Flag setzen damit kein Doppel-Trigger
@@ -301,35 +267,21 @@ void clearMatrix() {
   fill_solid(leds, NUM_LEDS, COL_BLACK);
 }
 
-void drawChar(const uint8_t ch[4][5], int startX, int startY, CRGB color) {
-  for (int col = 0; col < 4; col++) {
-    for (int row = 0; row < 5; row++) {
-      if (ch[col][row]) {
-        int idx = xyToIndex(startX + col, startY + row);
-        if (idx >= 0) leds[idx] = color;
-      }
+void showStartScreen() {
+  Serial.println("[4Pong] Zeige integrierten Startbildschirm...");
+  for (int y = 0; y < MATRIX_H; y++) {
+    for (int x = 0; x < MATRIX_W; x++) {
+      uint32_t color = pgm_read_dword(&SCREEN_START[y][MATRIX_W - 1 - x]);
+      uint8_t r = (color >> 16) & 0xFF;
+      uint8_t g = (color >> 8)  & 0xFF;
+      uint8_t b =  color        & 0xFF;
+      int idx = xyToIndex(x, y);
+      if (idx >= 0) leds[idx] = CRGB(r, g, b);
     }
   }
+  FastLED.show();
+  Serial.println("[4Pong] Startbildschirm angezeigt");
 }
-
-void showStartScreen() {
-  Serial.println("[4Pong] Lade Startbildschirm...");
-  bool ok = showBMP("/start.bmp", leds, NUM_LEDS, MATRIX_W, MATRIX_H, xyToIndex);
-  if (!ok) {
-    // Fallback: Text anzeigen wenn BMP fehlt
-    clearMatrix();
-    drawChar(FONT_4, 6,  2, COL_BALL);
-    drawChar(FONT_P, 12, 9, COL_BALL);
-    drawChar(FONT_O, 8,  9, COL_BALL);
-    drawChar(FONT_N, 4,  9, COL_BALL);
-    drawChar(FONT_G, 0,  9, COL_BALL);
-    FastLED.show();
-    Serial.println("[4Pong] Fallback: Text-Startbildschirm angezeigt");
-  } else {
-    Serial.println("[4Pong] Startbildschirm (BMP) angezeigt");
-  }
-}
-
 
 // ============================================================
 // SPIEL INITIALISIEREN
@@ -358,7 +310,6 @@ void startGame() {
   ballSpeed = BALL_START_SPEED;
   lastSpeedUp = millis();
   score = 0;
-
   // Diagonaler Startwinkel, nie achsenparallel
   int baseAngles[] = {30, 60, 120, 150, 210, 240, 300, 330};
   ballAngle = baseAngles[random(0, 8)] + random(-10, 10);
@@ -540,7 +491,6 @@ void reflectBall(int paddleId, int half) {
     bool hitTop   = (half == 0);
     deflect = (flyingUp == hitTop) ? PADDLE_DEFLECT_ANGLE : -PADDLE_DEFLECT_ANGLE;
   }
-
   a = fmod(a + deflect + 360.0f, 360.0f);
   ballAngle = a;
 }
@@ -635,4 +585,5 @@ void fillGameOverPixels() {
 
     gameOverPixels++;
   }
+  delay(50);
 }

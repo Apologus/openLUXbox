@@ -16,10 +16,10 @@
 #define CHIPSET           WS2812B
 #define GLOBAL_BRIGHTNESS 80 // ~20% Helligkeit gemäß GSD
 
-#define PIN_BTN_GELB      14 // GPIO 14 (D5) - Spieler 0 (GELB)
-#define PIN_BTN_GRUEN     4  // GPIO 4  (D2) - Spieler 1 (GRÜN)
-#define PIN_BTN_WEISS     5  // GPIO 5  (D1) - Spieler 2 (WEISS)
-#define PIN_BTN_BLAU      12 // GPIO 12 (D6) - Spieler 3 (BLAU)
+#define PIN_BTN_GELB      14 // GPIO 14 (D5) - Spieler 0 (GELB - LINKS)
+#define PIN_BTN_GRUEN     4  // GPIO 4  (D2) - Spieler 1 (GRÜN - RECHTS)
+#define PIN_BTN_WEISS     5  // GPIO 5  (D1) - Spieler 2 (WEISS - UNTEN)
+#define PIN_BTN_BLAU      12 // GPIO 12 (D6) - Spieler 3 (BLAU - HOCH/OBEN)
 
 #define NUM_PLAYERS       4
 
@@ -33,18 +33,22 @@ const bool DEV_MODE                   = false; // true = 4-Tasten-Cheat/Testmodu
 float    SCROLL_SPEED_INIT_PX_SEC     = 6.0f;  // Startgeschwindigkeit (Pixel / Sekunde)
 float    SCROLL_SPEED_MIN_PX_SEC      = 3.5f;  // Absolute Untergrenze
 float    SCROLL_SPEED_MAX_PX_SEC      = 10.0f; // Absolute Obergrenze
-uint32_t PROGRESSION_INTERVAL_MS      = 12000; // Alle X ms wird das Spiel schneller
+uint32_t PROGRESSION_INTERVAL_MS      = 12000; // Alle X ms wird das Spiel schneller & Dächer kürzer
 float    PROGRESSION_SPEED_FACTOR     = 1.08f; // Geschwindigkeitssteigerung (+8% pro Stufe)
 
 // --- LÜCKEN UND DÄCHER (DAS PURE SPRING-SPIEL) ---
 uint8_t  DACH_START_MIN               = 12;    // Mindestlänge Dach (in Spalten)
 uint8_t  DACH_START_MAX               = 20;    // Maximallänge Dach (in Spalten)
 uint8_t  DACH_ABSOLUT_MIN             = 6;     // Minimale Dachlänge bei hoher Progression
-uint8_t  LUECKEN_START_MIN            = 1;     // Minimale Lückenbreite 
-uint8_t  LUECKEN_START_MAX            = 3;     // Maximale Lückenbreite 
+
+uint8_t  LUECKEN_START_MIN            = 1;     // Start Mindestlücke
+uint8_t  LUECKEN_START_MAX            = 3;     // Start Maximallücke
+uint8_t  LUECKEN_ABSOLUT_MIN          = 4;     // End-Mindestlücke nach Progression
+uint8_t  LUECKEN_ABSOLUT_MAX          = 4;     // End-Maximallücke nach Progression
+uint32_t LUECKEN_PROGRESSION_INTERVAL_MS = 10000; // Alle 10s wachsen die Lücken
 
 // --- ZUSATZFEATURES (SETZE AUF 0, UM SIE VOLLSTÄNDIG DEAKTIVIEREN) ---
-uint8_t  KISTEN_SPAWN_CHANCE_PERCENT  = 3;     // Chance (%) für Kisten auf Dächern pro Pixel (0 = AUS)
+uint8_t  KISTEN_SPAWN_CHANCE_PERCENT  = 2;     // Chance (%) für Kisten auf Dächern pro Pixel (0 = AUS)
 uint8_t  BRUECHIG_SPAWN_CHANCE_PERCENT= 0;     // Chance (%) für einstürzenden Boden (0 = AUS)
 uint8_t  TAUBEN_SPAWN_CHANCE_PERCENT  = 0;     // Chance (%) für Tauben (0 = AUS)
 uint8_t  GEFAHR_SPAWN_CHANCE_PERCENT  = 15;    // Chance (%) pro Sekunde für Trümmer (0 = AUS)
@@ -60,10 +64,10 @@ const float    KISTEN_BREMSFAKTOR       = 0.60f; // Geschwindigkeit nach Kistenk
 const uint32_t GEFAHR_WARNDAUER_MS      = 600;   // Dauer Warnblinken vor Trümmereinschlag
 const uint32_t GEFAHR_COOLDOWN_MS       = 5000;  // Mindestabstand zwischen Trümmern
 
-// --- POSITIONEN (GSD KONFORM) ---
+// --- POSITIONEN (GSD KONFORM, 1 LED NACH OBEN VERSETZT) ---
 const uint8_t  FIGUR_X                  = 4;     // Feste X-Position der Spielfigur
-const uint8_t  BODEN_Y                  = 14;    // Y-Position der Dachoberkante
-const uint8_t  FIGUR_STAND_Y            = 13;    // Y-Position Figur stehend (Y 13)
+const uint8_t  BODEN_Y                  = 13;    // Y-Position der Dachoberkante (1 LED nach oben versetzt)
+const uint8_t  FIGUR_STAND_Y            = 12;    // Y-Position Figur stehend (Y 12)
 
 const uint8_t  MAX_PARTIKEL             = 24;    // Max. aktive Partikel (GSD Limit)
 const uint8_t  RING_BUFFER_SIZE         = 60;    // Ringpuffergröße (GSD fordert min. 40)
@@ -71,7 +75,7 @@ const uint8_t  BG_PATTERN_SIZE          = 64;    // Parallax-Musterlänge
 
 // GSD Farbdefinitionen
 const CRGB COLOR_BACKGROUND   = CRGB(0, 0, 0);
-const CRGB COLOR_PLAYER       = CRGB(255, 255, 255);
+const CRGB COLOR_PLAYER       = CRGB(240, 160, 120);
 const CRGB COLOR_BODEN        = CRGB(60, 60, 60);
 const CRGB COLOR_BRUECHIG     = CRGB(180, 80, 0);
 const CRGB COLOR_KISTE        = CRGB(160, 80, 10);
@@ -79,10 +83,10 @@ const CRGB COLOR_MISSILE      = CRGB(255, 30, 0);
 const CRGB COLOR_PIGEON       = CRGB(150, 150, 150);
 
 const CRGB PLAYER_COLORS[NUM_PLAYERS] = {
-  CRGB(255, 255, 0),   // 0: GELB
-  CRGB(0, 255, 0),     // 1: GRÜN
-  CRGB(255, 255, 255), // 2: WEISS
-  CRGB(0, 0, 255)      // 3: BLAU
+  CRGB(255, 255, 0),   // 0: GELB  (Links)
+  CRGB(0, 255, 0),     // 1: GRÜN  (Rechts)
+  CRGB(255, 255, 255), // 2: WEISS (Unten)
+  CRGB(0, 0, 255)      // 3: BLAU  (Hoch/Oben)
 };
 
 const uint8_t BUTTON_PINS[NUM_PLAYERS] = {
@@ -177,7 +181,9 @@ uint32_t lastDuoSwitchTime = 0;
 uint32_t duoFirstPressTime = 0;
 uint32_t gameStartTime = 0;
 uint32_t gameOverStartTime = 0;
+bool     gameOverShowScore = false;
 uint32_t lastProgressionTime = 0;
+uint32_t lastLueckenProgressionTime = 0;
 uint32_t lastGefahrCheckTime = 0;
 
 uint8_t activeDuoPlayer1 = 0;
@@ -199,6 +205,8 @@ uint32_t scoreMeters = 0;
 float    currentSpeed = 3.5f;
 uint8_t  currentDachMin = 8;
 uint8_t  currentDachMax = 14;
+uint8_t  currentLueckeMin = 1;
+uint8_t  currentLueckeMax = 3;
 
 bool    isJumping = false;
 uint8_t jumpFrame = 0;
@@ -228,6 +236,7 @@ void triggerShake(uint32_t dauerMs, uint8_t intensitaet);
 void drawDigit(uint8_t digit, int8_t offsetX, int8_t offsetY, CRGB color);
 void drawChar5x8(const uint8_t rows[8], int8_t offsetX, int8_t offsetY, CRGB color);
 void selectNewDuo();
+void drawPlayerIndicator(uint8_t player);
 void generateSingleColumn(uint32_t targetWeltSpalte);
 void renderIntroScreen(uint32_t now);
 void renderStartScreen();
@@ -302,7 +311,7 @@ void initBackgroundSkyline() {
   uint8_t col = 0;
   while (col < BG_PATTERN_SIZE) {
     uint8_t hausBreite = random(3, 7);
-    uint8_t hausHoeheY = random(2, 8); 
+    uint8_t hausHoeheY = random(1, 7); 
     uint8_t shade = random(10, 25);
     CRGB hausFarbe = CRGB(shade / 2, shade / 2, shade);
 
@@ -311,7 +320,7 @@ void initBackgroundSkyline() {
       bgSkyline[col].farbe = hausFarbe;
       bgSkyline[col].windowMask = 0;
       if (b % 2 == 0) {
-        for (uint8_t y = hausHoeheY + 1; y <= 12; y += 2) {
+        for (uint8_t y = hausHoeheY + 1; y <= 11; y += 2) {
           if (random(100) < 25) { 
             bgSkyline[col].windowMask |= (1 << y);
           }
@@ -336,7 +345,7 @@ static bool    isDachState = true;
 void generateSingleColumn(uint32_t targetWeltSpalte) {
   uint8_t bufferIndex = targetWeltSpalte % RING_BUFFER_SIZE;
 
-  // Garantiere 30 Spalten freie Startzone
+  // Garantiere freie Startzone
   if (targetWeltSpalte < 20) {
     Spalte s;
     s.boden = true;
@@ -355,7 +364,7 @@ void generateSingleColumn(uint32_t targetWeltSpalte) {
     if (isDachState) {
       abschnittRest = random(currentDachMin, currentDachMax + 1);
     } else {
-      abschnittRest = random(LUECKEN_START_MIN, LUECKEN_START_MAX + 1);
+      abschnittRest = random(currentLueckeMin, currentLueckeMax + 1);
     }
   }
 
@@ -390,6 +399,8 @@ void resetGame() {
   currentSpeed = SCROLL_SPEED_INIT_PX_SEC;
   currentDachMin = DACH_START_MIN;
   currentDachMax = DACH_START_MAX;
+  currentLueckeMin = LUECKEN_START_MIN;
+  currentLueckeMax = LUECKEN_START_MAX;
 
   isJumping = false;
   jumpFrame = 0;
@@ -411,10 +422,12 @@ void resetGame() {
 
   selectNewDuo();
   lastProgressionTime = millis();
+  lastLueckenProgressionTime = millis();
   lastGefahrCheckTime = millis();
 }
 
 void applyProgression(uint32_t now) {
+  // Speed & Dachverkürzung alle 12s
   if (now - lastProgressionTime >= PROGRESSION_INTERVAL_MS) {
     lastProgressionTime = now;
 
@@ -425,6 +438,14 @@ void applyProgression(uint32_t now) {
 
     if (currentDachMin > DACH_ABSOLUT_MIN) currentDachMin--;
     if (currentDachMax > DACH_ABSOLUT_MIN + 2) currentDachMax--;
+  }
+
+  // Lückenvergrößerung alle 10s (von 1-3 schrittweise auf 3-5)
+  if (now - lastLueckenProgressionTime >= LUECKEN_PROGRESSION_INTERVAL_MS) {
+    lastLueckenProgressionTime = now;
+
+    if (currentLueckeMin < LUECKEN_ABSOLUT_MIN) currentLueckeMin++;
+    if (currentLueckeMax < LUECKEN_ABSOLUT_MAX) currentLueckeMax++;
   }
 }
 
@@ -442,7 +463,7 @@ void checkGefahrenSpawns(uint32_t now) {
         aktiveGefahr.weltSpalte = currentWeltSpalte + 22;
         aktiveGefahr.spawnZeit = now;
         aktiveGefahr.istGefallen = false;
-        aktiveGefahr.aktuellY = 0;
+        aktiveGefahr.aktuellY = 1;
       }
     }
   }
@@ -470,7 +491,9 @@ void updateInput() {
         }
 
         if (currentState == STATE_GAMEOVER) {
-          if (now - gameOverStartTime > 1000) {
+          if (!gameOverShowScore) {
+            gameOverShowScore = true;
+          } else if (now - gameOverStartTime > 500) {
             currentState = STATE_START;
           }
           return;
@@ -588,51 +611,58 @@ void updatePhysicsAndWorld(uint32_t now) {
   uint8_t figurBufferIdx = weltSpalteUnterFigur % RING_BUFFER_SIZE;
   Spalte* curSpalte = &ringBuffer[figurBufferIdx];
 
-  if (curSpalte->taube) {
-    curSpalte->taube = false;
-    spawnPartikel(FIGUR_X, FIGUR_STAND_Y, 0.5f, -0.8f, 350, COLOR_PIGEON);
-    spawnPartikel(FIGUR_X, FIGUR_STAND_Y, 0.8f, -0.5f, 350, COLOR_PIGEON);
-  }
-
   if (!isJumping) {
+    if (!curSpalte->boden) {
+      currentState = STATE_GAMEOVER;
+      gameOverStartTime = now;
+      gameOverShowScore = false;
+      return;
+    }
+
     if (curSpalte->gefahr) {
       currentState = STATE_GAMEOVER;
       gameOverStartTime = now;
-      triggerShake(500, 2);
+      gameOverShowScore = false;
       return;
     }
 
     if (curSpalte->kiste) {
-      curSpalte->kiste = false;
       kistenBremseEnde = now + KISTEN_BREMSZEIT_MS;
-      spawnPartikel(FIGUR_X, FIGUR_STAND_Y, 0.2f, -0.4f, 300, COLOR_KISTE);
-      spawnPartikel(FIGUR_X, FIGUR_STAND_Y, 0.4f, -0.2f, 300, COLOR_KISTE);
-      triggerShake(150, 1);
+      curSpalte->kiste = false;
+      spawnPartikel(FIGUR_X, BODEN_Y - 1, -0.8f, -0.5f, 400, COLOR_KISTE);
+      spawnPartikel(FIGUR_X, BODEN_Y - 1, 0.8f, -0.5f, 400, COLOR_KISTE);
+    }
+
+    if (curSpalte->taube) {
+      curSpalte->taube = false;
+      for (uint8_t p = 0; p < 4; p++) {
+        spawnPartikel(FIGUR_X, BODEN_Y - 1, random(-10, 10) / 10.0f, -1.0f - random(0, 10) / 10.0f, 500, COLOR_PIGEON);
+      }
     }
 
     if (curSpalte->bruechig) {
       if (curSpalte->bruechigBetretenZeit == 0) {
         curSpalte->bruechigBetretenZeit = now;
-      } else if (now - curSpalte->bruechigBetretenZeit >= BRUECHIG_VERZOEGERUNG_MS) {
+      } else if (now - curSpalte->bruechigBetretenZeit > BRUECHIG_VERZOEGERUNG_MS) {
         curSpalte->boden = false;
-        curSpalte->bruechig = false;
-        spawnPartikel(FIGUR_X, BODEN_Y, 0.0f, 0.5f, 350, COLOR_BRUECHIG);
+        spawnPartikel(FIGUR_X, BODEN_Y, -0.5f, 0.5f, 300, COLOR_BRUECHIG);
+        spawnPartikel(FIGUR_X, BODEN_Y, 0.5f, 0.5f, 300, COLOR_BRUECHIG);
+        currentState = STATE_GAMEOVER;
+        gameOverStartTime = now;
+        gameOverShowScore = false;
+        return;
       }
-    }
-
-    if (!curSpalte->boden) {
-      currentState = STATE_GAMEOVER;
-      gameOverStartTime = now;
-      triggerShake(500, 2);
-      return;
     }
   }
 
   if (aktiveGefahr.aktiv) {
-    if (now - aktiveGefahr.spawnZeit > GEFAHR_WARNDAUER_MS) {
-      aktiveGefahr.istGefallen = true;
-      aktiveGefahr.aktuellY = (now - (aktiveGefahr.spawnZeit + GEFAHR_WARNDAUER_MS)) / 40;
-
+    if (!aktiveGefahr.istGefallen) {
+      if (now - aktiveGefahr.spawnZeit > GEFAHR_WARNDAUER_MS) {
+        aktiveGefahr.istGefallen = true;
+        aktiveGefahr.aktuellY = 1;
+      }
+    } else {
+      aktiveGefahr.aktuellY += 2;
       if (aktiveGefahr.aktuellY >= BODEN_Y) {
         int32_t relX = (int32_t)aktiveGefahr.weltSpalte - (int32_t)currentWeltSpalte;
         if (relX >= 0 && relX < 16) {
@@ -699,18 +729,14 @@ void triggerShake(uint32_t dauerMs, uint8_t intensitaet) {
   shakeIntensitaet = intensitaet;
 }
 
-// ============================================================================
-// 8. RENDERER
-// ============================================================================
 void drawChar5x8(const uint8_t rows[8], int8_t offsetX, int8_t offsetY, CRGB color) {
   for (uint8_t r = 0; r < 8; r++) {
-    uint8_t rowVal = rows[r];
     for (uint8_t c = 0; c < 5; c++) {
-      if ((rowVal >> (4 - c)) & 0x01) {
-        int8_t px = offsetX + c;
-        int8_t py = offsetY + r;
-        if (px >= 0 && px < 16 && py >= 0 && py < 16) {
-          leds[olb_xy(px, py)] = color;
+      if ((rows[r] >> (4 - c)) & 0x01) {
+        int8_t x = offsetX + c;
+        int8_t y = offsetY + r;
+        if (x >= 0 && x < 16 && y >= 0 && y < 16) {
+          leds[olb_xy(x, y)] = color;
         }
       }
     }
@@ -719,10 +745,7 @@ void drawChar5x8(const uint8_t rows[8], int8_t offsetX, int8_t offsetY, CRGB col
 
 void renderIntroScreen(uint32_t now) {
   FastLED.clear();
-
-  if (introStartTime == 0) {
-    introStartTime = now;
-  }
+  if (introStartTime == 0) introStartTime = now;
 
   int16_t scrollX = 16 - (int16_t)((now - introStartTime) / 90);
 
@@ -760,6 +783,28 @@ void renderCountdownScreen(uint32_t now) {
   }
 }
 
+void drawPlayerIndicator(uint8_t player) {
+  CRGB col = PLAYER_COLORS[player];
+  switch (player) {
+    case 0: // Links (Gelb - D5/GPIO14)
+      leds[olb_xy(0, 7)] = col;
+      leds[olb_xy(0, 8)] = col;
+      break;
+    case 1: // Rechts (Grün - D2/GPIO4)
+      leds[olb_xy(15, 7)] = col;
+      leds[olb_xy(15, 8)] = col;
+      break;
+    case 2: // Unten (Weiß - D1/GPIO5)
+      leds[olb_xy(7, 15)] = col;
+      leds[olb_xy(8, 15)] = col;
+      break;
+    case 3: // Hoch / Oben (Blau - D6/GPIO12)
+      leds[olb_xy(7, 0)] = col;
+      leds[olb_xy(8, 0)] = col;
+      break;
+  }
+}
+
 void renderGameScreen() {
   FastLED.clear();
 
@@ -768,12 +813,14 @@ void renderGameScreen() {
     uint8_t bgIdx = (bgOffset + x) % BG_PATTERN_SIZE;
     BackgroundSpalte bgCol = bgSkyline[bgIdx];
 
-    for (uint8_t y = bgCol.hoeheY; y <= 13; y++) {
-      leds[olb_xy(x, y)] = bgCol.farbe;
+    for (uint8_t y = bgCol.hoeheY; y <= 12; y++) {
+      if (y >= 1 && y <= 14) {
+        leds[olb_xy(x, y)] = bgCol.farbe;
+      }
     }
-    for (uint8_t y = bgCol.hoeheY + 1; y <= 13; y++) {
-      if ((bgCol.windowMask >> y) & 0x01) {
-        leds[olb_xy(x, y)] = CRGB(255, 240, 150);
+    for (uint8_t y = bgCol.hoeheY + 1; y <= 12; y++) {
+      if (y >= 1 && y <= 14 && ((bgCol.windowMask >> y) & 0x01)) {
+        leds[olb_xy(x, y)] = CRGB(153, 144, 90); // 60% Helligkeit von CRGB(255, 240, 150)
       }
     }
   }
@@ -803,20 +850,20 @@ void renderGameScreen() {
         dachFarbeUnten = (patternStep == 1) ? farbeDunkel : farbeHell;
       }
 
-      int8_t ry1 = BODEN_Y + shakeOffsetY;       // y = 14
-      int8_t ry2 = (BODEN_Y + 1) + shakeOffsetY; // y = 15
+      int8_t ry1 = BODEN_Y + shakeOffsetY;       // y = 13
+      int8_t ry2 = (BODEN_Y + 1) + shakeOffsetY; // y = 14
 
-      if (ry1 >= 0 && ry1 < 16) leds[olb_xy(rx, ry1)] = dachFarbeOben;
-      if (ry2 >= 0 && ry2 < 16) leds[olb_xy(rx, ry2)] = dachFarbeUnten;
+      if (ry1 >= 1 && ry1 <= 14) leds[olb_xy(rx, ry1)] = dachFarbeOben;
+      if (ry2 >= 1 && ry2 <= 14) leds[olb_xy(rx, ry2)] = dachFarbeUnten;
 
       if (s.kiste) {
         int8_t ryKiste = (BODEN_Y - 1) + shakeOffsetY;
-        if (ryKiste >= 0 && ryKiste < 16) leds[olb_xy(rx, ryKiste)] = COLOR_KISTE;
+        if (ryKiste >= 1 && ryKiste <= 14) leds[olb_xy(rx, ryKiste)] = COLOR_KISTE;
       }
 
       if (s.taube) {
         int8_t ryTaube = (BODEN_Y - 1) + shakeOffsetY;
-        if (ryTaube >= 0 && ryTaube < 16) leds[olb_xy(rx, ryTaube)] = COLOR_PIGEON;
+        if (ryTaube >= 1 && ryTaube <= 14) leds[olb_xy(rx, ryTaube)] = COLOR_PIGEON;
       }
     }
   }
@@ -832,7 +879,7 @@ void renderGameScreen() {
         }
       } else {
         int8_t ry = aktiveGefahr.aktuellY + shakeOffsetY;
-        if (ry >= 0 && ry < 16) {
+        if (ry >= 1 && ry <= 14) {
           leds[olb_xy(relX, ry)] = COLOR_MISSILE;
         }
       }
@@ -841,7 +888,7 @@ void renderGameScreen() {
 
   int8_t prx = FIGUR_X + shakeOffsetX;
   int8_t pry = playerY + shakeOffsetY;
-  if (prx >= 0 && prx < 16 && pry >= 0 && pry < 16) {
+  if (prx >= 0 && prx < 16 && pry >= 1 && pry <= 14) {
     leds[olb_xy(prx, pry)] = COLOR_PLAYER;
   }
 
@@ -849,35 +896,27 @@ void renderGameScreen() {
     if (partikelPuffer[i].aktiv) {
       int16_t px = (int16_t)partikelPuffer[i].x + shakeOffsetX;
       int16_t py = (int16_t)partikelPuffer[i].y + shakeOffsetY;
-      if (px >= 0 && px < 16 && py >= 0 && py < 16) {
+      if (px >= 0 && px < 16 && py >= 1 && py <= 14) {
         leds[olb_xy(px, py)] = partikelPuffer[i].farbe;
       }
     }
   }
 
-  // Duo-Balken: Ganze oberste Reihe (Y=0), linke Hälfte Spieler 1, rechte Hälfte Spieler 2
-  for (uint8_t x = 0; x < 8; x++) {
-    leds[olb_xy(x, 0)] = PLAYER_COLORS[activeDuoPlayer1];
-  }
-  for (uint8_t x = 8; x < 16; x++) {
-    leds[olb_xy(x, 0)] = PLAYER_COLORS[activeDuoPlayer2];
-  }
+  // Duo-Anzeige an den jeweiligen Seiten (je 2 LEDs mittig vor dem Button)
+  drawPlayerIndicator(activeDuoPlayer1);
+  drawPlayerIndicator(activeDuoPlayer2);
 }
 
 void renderGameOverScreen(uint32_t now) {
   uint32_t elapsed = now - gameOverStartTime;
   FastLED.clear();
 
-  if (elapsed < 600) {
+  if (elapsed < 600 && !gameOverShowScore) {
     if ((elapsed / 150) % 2 == 0) {
       for (int i = 0; i < NUM_LEDS; i++) leds[i] = CRGB(255, 0, 0);
     }
-  } else if (elapsed < 1600) {
-    for (uint8_t i = 0; i < 16; i++) {
-      leds[olb_xy(i, i)] = CRGB(255, 0, 0);
-      leds[olb_xy(15 - i, i)] = CRGB(255, 0, 0);
-    }
   } else {
+    gameOverShowScore = true;
     uint16_t score = scoreMeters;
     if (score < 1000) {
       uint8_t d100 = score / 100;
@@ -899,7 +938,7 @@ void renderGameOverScreen(uint32_t now) {
       snprintf(buf, sizeof(buf), "%u", score);
       uint8_t len = strlen(buf);
 
-      uint32_t digitPhase = (elapsed - 1600) / 600;
+      uint32_t digitPhase = (elapsed - 600) / 600;
       uint8_t showDigitIndex = min((uint32_t)len - 1, digitPhase);
 
       drawDigit(buf[showDigitIndex] - '0', 6, 5, CRGB(255, 255, 255));
