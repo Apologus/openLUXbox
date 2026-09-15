@@ -2,6 +2,6 @@ CanoLbalt
 Rennt über die Dächer der Stadt um Euer Leben, springt über Schluchten, Hindernisse und über herabstürzende Trümmerteile. Wie lange haltet Ihr durch?
 Nach dem Vorbild von Canabalt müssen die 4 Spieler*innen die Spielfigur rechtzeitig springen lassen.
 Ziel: Als Team möglichst weit über die Dächer rennen, ohne abzustürzen oder von Trümmern getroffen zu werden.
-Wer springt? Vor jedem Sprung leuchten am Rand die LED-Farben der **zwei Spieler\*innen**, die als nächstes an der Reihe sind.
-Was tun? Nur die beiden aufgerufenen Spieler\*innen müssen **gleichzeitig** ihren Button drücken, damit die Figur springt.
+Wer springt? Vor jedem Sprung leuchten am Rand die LED-Farben der zwei Spieler*innen, die als nächstes an der Reihe sind.
+Was tun? Nur die beiden aufgerufenen Spieler*innen müssen gleichzeitig ihren Button drücken, damit die Figur springt.
 Tipp: Taster gedrückt halten, um weiter zu springen. Nach jedem Sprung wechselt das Duo!
