@@ -1,3 +1,3 @@
 Frog
-Steuert gemeinsam den Frosch zu den Fliegen am oberen Bildschirmrand. Ein kooperativer Frogger-Klon.
+Ein kooperativer Frogger-Klon. Steuert gemeinsam den Frosch zu den Fliegen am oberen Bildschirmrand. Bevor die Fliegen erscheinen, müsst Ihr aber 2 oder mehr Glühwürmchen aufsammeln, die an zufälliger Stelle erscheinen.
 
