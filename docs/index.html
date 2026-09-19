@@ -319,7 +319,7 @@
 
         function createConfigBinary(selected) {
             const buffer = new Uint8Array(256);
-            // Magic: 'O','L','B','X' (0x4F4C4258 Little Endian)
+            // Magic: 'O','L','B','X' (0x4F4C4258)
             buffer[0] = 0x58; buffer[1] = 0x42; buffer[2] = 0x4C; buffer[3] = 0x4F;
             buffer[4] = selected.length;
 
@@ -329,7 +329,7 @@
                 for (let c = 0; c < Math.min(str.length, 15); c++) {
                     buffer[offsetName + c] = str.charCodeAt(c);
                 }
-                buffer[offsetName + 15] = 0; // null-terminated
+                buffer[offsetName + 15] = 0; // Null-terminiert
             }
 
             const offsetSlots = 5 + (3 * 16);
@@ -411,8 +411,9 @@
                     flashMode: 'dio',
                     flashFreq: '40m',
                     eraseAll: false,
+                    compress: true,
                     calculateMD5Hash: (image) => CryptoJS.MD5(CryptoJS.enc.Latin1.parse(image)).toString(),
-                    onProgress: (fileIndex, written, total) => {
+                    reportProgress: (fileIndex, written, total) => {
                         const percent = Math.round((written / total) * 100);
                         progressFill.style.width = percent + '%';
                         statusText.innerText = `Flashe Teil ${fileIndex + 1}/${fileArray.length}: ${percent}%`;
@@ -420,7 +421,7 @@
                 });
 
                 statusText.innerText = '✅ Erfolgreich geflasht! openLUXbox startet neu...';
-                await esploader.hardReset();
+                await esploader.after('hard_reset');
                 await transport.disconnect();
             } catch (err) {
                 console.error(err);
