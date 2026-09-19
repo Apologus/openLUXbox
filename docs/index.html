@@ -1,284 +1,423 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>openLUXbox Web–Flasher</title>
-  <script type="module" src="https://unpkg.com/esp-web-tools@9/dist/web/install-button.js"></script>
-  <style>
-    :root {
-      --bg:      #121212;
-      --surface: #1e1e1e;
-      --card-sub:#252525;
-      --border:  #333;
-      --text:    #e0e0e0;
-      --sub:     #888;
-      --accent:  #4fc3f7;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 30px 16px;
-    }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 32px 28px;
-      width: 100%;
-      max-width: 520px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    }
-
-    .logo-wrap {
-      text-align: center;
-      margin-bottom: 22px;
-    }
-
-    .logo-wrap img {
-      width: 440px;
-      max-width: 100%;
-      height: auto;
-    }
-
-    h1 {
-      font-size: 1.4rem;
-      color: var(--accent);
-      text-align: center;
-      margin-bottom: 18px;
-    }
-
-    p.subtitle {
-      color: var(--sub);
-      font-size: 0.95rem;
-      text-align: center;
-      margin-bottom: 18px;
-    }
-
-    label {
-      display: block;
-      font-size: 0.9rem;
-      margin-bottom: 6px;
-      color: var(--text);
-    }
-
-    select {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: #2a2a2a;
-      color: var(--text);
-      font-size: 1rem;
-      margin-bottom: 20px;
-    }
-
-    /* Detailbereich für Screenshot & Beschreibung */
-    .preview-card {
-      display: none;
-      background: var(--card-sub);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 18px 16px;
-      margin-bottom: 20px;
-      text-align: left;
-    }
-
-    .preview-headline {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: var(--accent);
-      margin-bottom: 12px;
-      text-align: center;
-    }
-
-    .preview-img-wrap {
-      text-align: center;
-      margin-bottom: 14px;
-    }
-
-    .preview-img-wrap img {
-      max-width: 100%;
-      max-height: 240px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      object-fit: contain;
-    }
-
-    .preview-description {
-      font-size: 0.88rem;
-      color: #ccc;
-      line-height: 1.5;
-      white-space: pre-wrap;
-    }
-
-    esp-web-install-button {
-      display: block;
-      margin-bottom: 16px;
-    }
-
-    .hint {
-      font-size: 0.78rem;
-      color: var(--sub);
-      text-align: center;
-      margin-top: 8px;
-    }
-
-    .powered-by {
-      font-size: 0.78rem;
-      color: var(--sub);
-      text-align: center;
-      margin-top: 14px;
-    }
-
-    .powered-by a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    details {
-      margin-top: 28px;
-      border-top: 1px solid var(--border);
-      padding-top: 14px;
-    }
-
-    summary {
-      cursor: pointer;
-      font-size: 0.82rem;
-      color: var(--sub);
-      list-style: none;
-      text-align: center;
-    }
-
-    summary::-webkit-details-marker { display: none; }
-    summary::before { content: "▸ "; }
-    details[open] summary::before { content: "▾ "; }
-
-    .impressum {
-      margin-top: 12px;
-      font-size: 0.8rem;
-      color: var(--sub);
-      line-height: 1.7;
-      text-align: center;
-    }
-
-    .impressum a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>openLUXbox - Multi-Game Flasher</title>
+    <!-- ESP Web Tools Loader & esptool-js -->
+    <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+    <script src="https://unpkg.com/esptool-js@0.4.3/bundle.js"></script>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --accent-color: #00bcd4;
+            --accent-hover: #00acc1;
+            --disabled-color: #555;
+            --border-color: #333;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .header {
+            text-align: center;
+            max-width: 900px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .header img {
+            max-height: 90px;
+            margin-bottom: 10px;
+        }
+        .top-bar {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 900px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+        .slot-indicator {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .btn-flash {
+            background-color: var(--accent-color);
+            color: #000;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-flash:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+            transform: scale(1.02);
+        }
+        .btn-flash:disabled {
+            background-color: var(--disabled-color);
+            color: #888;
+            cursor: not-allowed;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+            max-width: 900px;
+            width: 100%;
+        }
+        .game-list {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            max-height: 480px;
+            overflow-y: auto;
+        }
+        .game-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.02);
+            transition: background 0.2s;
+        }
+        .game-item:hover {
+            background: rgba(255,255,255,0.07);
+        }
+        .game-item.active {
+            background: rgba(0, 188, 212, 0.15);
+            border-left: 4px solid var(--accent-color);
+        }
+        .game-item input[type="checkbox"] {
+            margin-right: 12px;
+            transform: scale(1.3);
+            cursor: pointer;
+        }
+        .game-item label {
+            cursor: pointer;
+            flex-grow: 1;
+            font-weight: 500;
+        }
+        .preview-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .preview-card img {
+            max-width: 100%;
+            max-height: 250px;
+            object-fit: contain;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .preview-card h2 {
+            margin: 0 0 10px 0;
+            color: var(--accent-color);
+        }
+        .preview-card p {
+            line-height: 1.5;
+            color: #bbb;
+        }
+        #progress-box {
+            width: 100%;
+            max-width: 900px;
+            margin-top: 15px;
+            display: none;
+        }
+        .progress-bar-bg {
+            background: #2a2a2a;
+            border-radius: 6px;
+            height: 14px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+        .progress-bar-fill {
+            background: var(--accent-color);
+            height: 100%;
+            width: 0%;
+            transition: width 0.1s;
+        }
+        #status-text {
+            font-size: 0.9rem;
+            color: #aaa;
+            font-family: monospace;
+        }
+    </style>
 </head>
 <body>
-  <div class="card">
 
-    <div class="logo-wrap">
-      <img src="openLUXbox.png" alt="openLUXbox Logo">
+    <div class="header">
+        <img src="openLUXbox.png" alt="openLUXbox Logo">
+        <h1>openLUXbox Multi-Game Installer</h1>
     </div>
 
-    <h1>Web–Flasher</h1>
-    <p class="subtitle">Firmware auswählen · openLUXbox per USB verbinden · Flashen</p>
-
-    <label for="firmware-select">Firmware / Spiel auswählen:</label>
-    <select id="firmware-select" onchange="onSelectionChanged()">
-      <option value="">– bitte wählen –</option>
-        <option value="4Pong">4Pong</option>
-        <option value="Frog">Frog</option>
-        <option value="Lux">Lux</option>
-        <option value="Nano Hexagon">Nano Hexagon</option>
-        <option value="Snake">Snake</option>
-        <option value="canoLbalt">CanoLbalt</option>
-    </select>
-
-    <!-- Vorschau-Bereich mit zentraler Headline -->
-    <div id="preview-box" class="preview-card">
-      <div id="preview-headline" class="preview-headline"></div>
-
-      <div id="preview-img-wrap" class="preview-img-wrap" style="display:none;">
-        <img id="preview-img" src="" alt="Screenshot">
-      </div>
-
-      <div id="preview-description" class="preview-description"></div>
+    <div class="top-bar">
+        <div class="slot-indicator">
+            Ausgewählt: <span id="selected-count" style="color: var(--accent-color);">0</span> / 3 Spiele
+        </div>
+        <button id="flash-button" class="btn-flash" disabled onclick="startMultiFlash()">Flashen</button>
     </div>
 
-    <esp-web-install-button id="install-btn" style="display:none"></esp-web-install-button>
+    <div id="progress-box">
+        <div class="progress-bar-bg">
+            <div id="progress-fill" class="progress-bar-fill"></div>
+        </div>
+        <div id="status-text">Bereit.</div>
+    </div>
 
-    <p class="hint">⚠️ Nur in Chrome / Edge verfügbar &nbsp;·&nbsp; USB-Verbindung erforderlich</p>
+    <div class="container">
+        <!-- Spiele Liste Links -->
+        <div class="game-list" id="game-list"></div>
 
-    <p class="powered-by">
-      Realisiert mit <a href="https://esphome.github.io/esp-web-tools/" target="_blank" rel="noopener">ESP Web Tools</a>
-    </p>
+        <!-- Detailansicht Rechts -->
+        <div class="preview-card" id="preview-card">
+            <img id="preview-img" src="openLUXbox.png" alt="Preview">
+            <h2 id="preview-title">Wähle ein Spiel</h2>
+            <p id="preview-desc">Klicke auf ein Spiel in der Liste, um Details zu sehen, und setze den Haken, um es auf die openLUXbox zu laden.</p>
+        </div>
+    </div>
 
-    <details>
-      <summary>Impressum</summary>
-      <div class="impressum">
-        <strong>Angaben gemäß § 5 TMG</strong><br>
-        Jochen Wilke<br>
-        Ringstraße 16<br>
-        63546 Hammersbach<br><br>
-        <strong>Kontakt</strong><br>
-        <a href="mailto:openLUXbox@gmx.de">openLUXbox@gmx.de</a><br><br>
-        <em>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:</em><br>
-        Jochen Wilke, Ringstraße 16, 63546 Hammersbach
-      </div>
-    </details>
+    <script>
+        const GAMES = [
+  {
+    "id": "4Pong",
+    "title": "4Pong",
+    "displayTitle": "4PONG",
+    "bin": "firmware/4Pong/4Pong.bin",
+    "image": "firmware/4Pong/4Pong.jpg",
+    "description": "openLUXbox Game: 4Pong"
+  },
+  {
+    "id": "Frog",
+    "title": "Frog",
+    "displayTitle": "FROG",
+    "bin": "firmware/Frog/Frog.bin",
+    "image": "firmware/Frog/Frog.jpg",
+    "description": "openLUXbox Game: Frog"
+  },
+  {
+    "id": "Lux",
+    "title": "Lux",
+    "displayTitle": "LUX",
+    "bin": "firmware/Lux/Lux.bin",
+    "image": "firmware/Lux/Lux.jpg",
+    "description": "openLUXbox Game: Lux"
+  },
+  {
+    "id": "Nano Hexagon",
+    "title": "Nano Hexagon",
+    "displayTitle": "NANO HEXAGON",
+    "bin": "firmware/Nano Hexagon/Nano Hexagon.bin",
+    "image": "firmware/Nano Hexagon/Nano Hexagon.jpg",
+    "description": "openLUXbox Game: Nano Hexagon"
+  },
+  {
+    "id": "Snake",
+    "title": "Snake",
+    "displayTitle": "SNAKE",
+    "bin": "firmware/Snake/Snake.bin",
+    "image": "firmware/Snake/Snake.jpg",
+    "description": "openLUXbox Game: Snake"
+  },
+  {
+    "id": "canoLbalt",
+    "title": "Canolbalt",
+    "displayTitle": "CANOLBALT",
+    "bin": "firmware/canoLbalt/canoLbalt.bin",
+    "image": "firmware/canoLbalt/canoLbalt.jpg",
+    "description": "openLUXbox Game: Canolbalt"
+  }
+];
+        const MAX_SLOTS = 3;
+        let selectedGames = [];
 
-  </div>
+        function initUI() {
+            const listEl = document.getElementById('game-list');
+            listEl.innerHTML = '';
 
-  <script>
-    const fwData = {"4Pong": {"manifest": "firmware/4Pong/4Pong.json", "headline": "4Pong", "description": "Ein kooperativer Pong-Klon für 4 Spieler*innen. Jeder Button bewegt zwei Schläger in die eigene Richtung.", "screenshot": "firmware/4Pong/4Pong.jpg"}, "Frog": {"manifest": "firmware/Frog/Frog.json", "headline": "Frog", "description": "Ein kooperativer Frogger-Klon. Steuert gemeinsam den Frosch zu den Fliegen am oberen Bildschirmrand. Bevor die Fliegen erscheinen, müsst Ihr aber 2 oder mehr Glühwürmchen aufsammeln, die an zufälliger Stelle erscheinen.", "screenshot": "firmware/Frog/Frog.jpg"}, "Lux": {"manifest": "firmware/Lux/Lux.json", "headline": "Lux", "description": "Das Spiel, das der openLUXbox seinen Namen gegeben hat.\nSammelt mit dem grünen Spielpunkt den gelben Punkt ein. Vermeidet rote Barrieren!\nMit jedem Button gebt Ihr dem Spielpunkt Schub von der eigenen Seite weg. So kann der Spielpunkt beschleunigt, gebremst und auch zum Stillstand gebracht werden. Ruht der Punkt, wird er dunkler. Ein Timer am Bildschirmrand begrenzt die Zeit pro Level.\n17 Level mit steigendem Schwierigkeitsgrad, 3 Leben pro Spiel.", "screenshot": "firmware/Lux/Lux.jpg"}, "Nano Hexagon": {"manifest": "firmware/Nano Hexagon/Nano Hexagon.json", "headline": "Nano Hexagon", "description": "Weicht den roten Balken aus! Ein kooperativer Klon von Hexagon.", "screenshot": "firmware/Nano Hexagon/Nano Hexagon.jpg"}, "Snake": {"manifest": "firmware/Snake/Snake.json", "headline": "Snake", "description": "Ein simpler Snake-Klon. Dieses Spiel ist auf dem Workshop der Retrolution live per Vide-Coding entstanden.", "screenshot": "firmware/Snake/Snake.jpg"}, "canoLbalt": {"manifest": "firmware/canoLbalt/canoLbalt.json", "headline": "CanoLbalt", "description": "Rennt über die Dächer der Stadt um Euer Leben, springt über Schluchten, Hindernisse und über herabstürzende Trümmerteile. Wie lange haltet Ihr durch?\nNach dem Vorbild von Canabalt müssen die 4 Spieler*innen die Spielfigur rechtzeitig springen lassen.\nZiel: Als Team möglichst weit über die Dächer rennen, ohne abzustürzen oder von Trümmern getroffen zu werden.\nWer springt? Vor jedem Sprung leuchten am Rand die LED-Farben der zwei Spieler*innen, die als nächstes an der Reihe sind.\nWas tun? Nur die beiden aufgerufenen Spieler*innen müssen gleichzeitig ihren Button drücken, damit die Figur springt.\nTipp: Taster gedrückt halten, um weiter zu springen. Nach jedem Sprung wechselt das Duo!", "screenshot": "firmware/canoLbalt/canoLbalt.jpg"}};
+            GAMES.forEach((game, index) => {
+                const item = document.createElement('div');
+                item.className = 'game-item' + (index === 0 ? ' active' : '');
+                item.onclick = (e) => {
+                    if (e.target.tagName !== 'INPUT') showPreview(index);
+                };
 
-    function onSelectionChanged() {
-      const sel = document.getElementById('firmware-select');
-      const val = sel.value;
-      const btn = document.getElementById('install-btn');
-      const pBox = document.getElementById('preview-box');
-      const pHead = document.getElementById('preview-headline');
-      const pImgWrap = document.getElementById('preview-img-wrap');
-      const pImg = document.getElementById('preview-img');
-      const pDesc = document.getElementById('preview-description');
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.id = 'cb-' + game.id;
+                cb.onchange = (e) => toggleGame(game, e.target);
 
-      if (val && fwData[val]) {
-        const item = fwData[val];
+                const label = document.createElement('label');
+                label.htmlFor = 'cb-' + game.id;
+                label.innerText = game.title;
 
-        // Flash-Button verknüpfen und anzeigen
-        btn.setAttribute('manifest', item.manifest);
-        btn.style.display = 'block';
+                item.appendChild(cb);
+                item.appendChild(label);
+                listEl.appendChild(item);
+            });
 
-        // Zentrale Headline setzen
-        pHead.textContent = item.headline || '';
-
-        // Screenshot aktualisieren
-        if (item.screenshot) {
-          pImg.src = item.screenshot;
-          pImgWrap.style.display = 'block';
-        } else {
-          pImgWrap.style.display = 'none';
+            if (GAMES.length > 0) showPreview(0);
         }
 
-        // Fließtext setzen
-        if (item.description) {
-          pDesc.textContent = item.description;
-          pDesc.style.display = 'block';
-        } else {
-          pDesc.textContent = '';
-          pDesc.style.display = 'none';
+        function showPreview(index) {
+            const game = GAMES[index];
+            document.getElementById('preview-img').src = game.image;
+            document.getElementById('preview-title').innerText = game.title;
+            document.getElementById('preview-desc').innerText = game.description;
+
+            document.querySelectorAll('.game-item').forEach((el, i) => {
+                el.classList.toggle('active', i === index);
+            });
         }
 
-        pBox.style.display = 'block';
-      } else {
-        btn.style.display = 'none';
-        pBox.style.display = 'none';
-      }
-    }
-  </script>
+        function toggleGame(game, checkbox) {
+            if (checkbox.checked) {
+                if (selectedGames.length >= MAX_SLOTS) {
+                    checkbox.checked = false;
+                    alert('Maximal 3 Spiele gleichzeitig möglich!');
+                    return;
+                }
+                selectedGames.push(game);
+            } else {
+                selectedGames = selectedGames.filter(g => g.id !== game.id);
+            }
+
+            updateSlotStatus();
+        }
+
+        function updateSlotStatus() {
+            const countEl = document.getElementById('selected-count');
+            countEl.innerText = selectedGames.length;
+
+            const btn = document.getElementById('flash-button');
+            btn.disabled = (selectedGames.length === 0);
+
+            // Alle nicht gewählten Checkboxen deaktivieren, wenn voll
+            document.querySelectorAll('.game-item input[type="checkbox"]').forEach(cb => {
+                if (!cb.checked) {
+                    cb.disabled = (selectedGames.length >= MAX_SLOTS);
+                }
+            });
+        }
+
+        // Config-Array für 0x3FC000 erzeugen
+        function createConfigBinary(chosenGames) {
+            const buffer = new ArrayBuffer(256);
+            const view = new DataView(buffer);
+            const bytes = new Uint8Array(buffer);
+
+            // Magic: 'OLBX' (0x4F4C4258 Little Endian)
+            view.setUint32(0, 0x4F4C4258, true);
+            view.setUint8(4, chosenGames.length);
+
+            chosenGames.forEach((g, i) => {
+                // Slot 1, 2, 3
+                view.setUint8(5 + (3 * 16) + i, i + 1);
+                // Name (max 15 Zeichen + Nullbyte)
+                const nameStr = g.displayTitle.substr(0, 15);
+                for (let c = 0; c < nameStr.length; c++) {
+                    bytes[5 + (i * 16) + c] = nameStr.charCodeAt(c);
+                }
+            });
+
+            return new Uint8Array(buffer);
+        }
+
+        async function fetchBinary(url) {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('Konnte Datei nicht laden: ' + url);
+            const buf = await res.arrayBuffer();
+            return new Uint8Array(buf);
+        }
+
+        async function startMultiFlash() {
+            const progressBox = document.getElementById('progress-box');
+            const progressFill = document.getElementById('progress-fill');
+            const statusText = document.getElementById('status-text');
+            const flashBtn = document.getElementById('flash-button');
+
+            try {
+                flashBtn.disabled = true;
+                progressBox.style.display = 'block';
+                statusText.innerText = 'Verbinde mit openLUXbox (Web Serial)...';
+
+                const transport = new esptooljs.Transport(await navigator.serial.requestPort());
+                const esploader = new esptooljs.ESPLoader({
+                    transport: transport,
+                    baudrate: 115200,
+                    romBaudrate: 115200
+                });
+
+                await esploader.main();
+                statusText.innerText = 'Lade Binaries herunter...';
+
+                const fileArray = [];
+                // 1. Menu Bootloader auf Slot 0
+                const menuData = await fetchBinary('firmware/menu/menu.bin');
+                fileArray.push({ data: menuData, address: 0x000000 });
+
+                // 2. Gewählte Spiele auf Slot 1, 2, 3
+                const slotOffsets = [0x100000, 0x200000, 0x300000];
+                for (let i = 0; i < selectedGames.length; i++) {
+                    const gameData = await fetchBinary(selectedGames[i].bin);
+                    fileArray.push({ data: gameData, address: slotOffsets[i] });
+                }
+
+                // 3. Flash-Config auf 0x3FC000
+                const configData = createConfigBinary(selectedGames);
+                fileArray.push({ data: configData, address: 0x3FC000 });
+
+                statusText.innerText = 'Flashe openLUXbox...';
+
+                await esploader.writeFlash({
+                    fileArray: fileArray,
+                    flashSize: 'keep',
+                    flashMode: 'keep',
+                    flashFreq: 'keep',
+                    eraseAll: false,
+                    calculateMD5Hash: (image) => CryptoJS.MD5(CryptoJS.lib.ByteArray(image)).toString(),
+                    onProgress: (fileIndex, written, total) => {
+                        const percent = Math.round((written / total) * 100);
+                        progressFill.style.width = percent + '%';
+                        statusText.innerText = `Flashe Slot ${fileIndex + 1}/${fileArray.length}: ${percent}%`;
+                    }
+                });
+
+                statusText.innerText = '✅ Erfolgreich geflasht! openLUXbox startet neu...';
+                await esploader.hardReset();
+                await transport.disconnect();
+            } catch (err) {
+                console.error(err);
+                statusText.innerText = '❌ Fehler: ' + err.message;
+            } finally {
+                flashBtn.disabled = false;
+            }
+        }
+
+        window.onload = initUI;
+    </script>
 </body>
 </html>
