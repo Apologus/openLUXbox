@@ -1,12 +1,12 @@
 {
-  "name": "lux_esp8266",
+  "name": "Lux",
   "version": "1.0",
   "builds": [
     {
-      "chipFamily": "ESP8266",
+      "chipFamily": "ESP32",
       "parts": [
         {
-          "path": "lux_esp8266.bin",
+          "path": "Lux.bin",
           "offset": 0
         }
       ]

@@ -3,7 +3,7 @@
   "version": "1.0",
   "builds": [
     {
-      "chipFamily": "ESP8266",
+      "chipFamily": "ESP32",
       "parts": [
         {
           "path": "Snake.bin",

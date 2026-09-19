@@ -1,12 +1,12 @@
 {
-  "name": "nano_hexagon_esp8266",
+  "name": "Nano Hexagon",
   "version": "1.0",
   "builds": [
     {
-      "chipFamily": "ESP8266",
+      "chipFamily": "ESP32",
       "parts": [
         {
-          "path": "nano_hexagon_esp8266.bin",
+          "path": "Nano Hexagon.bin",
           "offset": 0
         }
       ]

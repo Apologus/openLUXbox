@@ -1,12 +1,12 @@
 {
-  "name": "4pong_esp8266",
+  "name": "4Pong",
   "version": "1.0",
   "builds": [
     {
-      "chipFamily": "ESP8266",
+      "chipFamily": "ESP32",
       "parts": [
         {
-          "path": "4pong_esp8266.bin",
+          "path": "4Pong.bin",
           "offset": 0
         }
       ]

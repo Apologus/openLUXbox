@@ -1,12 +1,12 @@
 {
-  "name": "frog_esp8266",
+  "name": "Frog",
   "version": "1.0",
   "builds": [
     {
-      "chipFamily": "ESP8266",
+      "chipFamily": "ESP32",
       "parts": [
         {
-          "path": "frog_esp8266.bin",
+          "path": "Frog.bin",
           "offset": 0
         }
       ]
