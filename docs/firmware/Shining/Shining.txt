@@ -1,0 +1,13 @@
+SHINING
+In der Dunkelheit erwacht ein pulsierender, leuchtender Kristallkern. Doch er wuchert unaufhaltsam – haltet das wabernde Licht gemeinsam im Zaum, bevor es den Spielfeldrand berührt und die Matrix in einer gewaltigen Farbexplosion verglüht!
+---
+Spielmechanismus (1–4 Spieler)
+* Position: An jeder der vier Kanten patrouilliert automatisch ein Farb-Geschütz (Gelb, Grün, Blau, Weiß).
+* Schießen: Ein Knopfdruck feuert einen Lichtstrahl der eigenen Farbe geradeaus ins Zentrum. (Erst nach Treffer oder Verlassen des Feldes ist der nächste Schuss bereit).
+* Farb-Matching: Schüsse zerstören nur Kern-Pixel der gleichen Farbe. Andere Farben werden durchdrungen.
+* Taktik & Freeze: Schüsse, die komplett durchgehen, frieren das gegenüberliegende Geschütz für 1 Sekunde ein.
+* Game Over: Das Spiel endet sofort, sobald das Kristallgitter eine der vier Außenkanten berührt.
+---
+Punkte & Highscore
+* +1 Punkt pro zerstörtem Farb-Pixel.
+* +50 Extrapunkte: Wenn der gesamte Kristallkern restlos abgeräumt wird (Screen flashed, neuer Kern startet bei höherem Spieltempo).

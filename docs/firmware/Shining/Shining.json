@@ -1,0 +1,15 @@
+{
+  "name": "SHINING",
+  "version": "1.0",
+  "builds": [
+    {
+      "chipFamily": "ESP8266",
+      "parts": [
+        {
+          "path": "Shining.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}
