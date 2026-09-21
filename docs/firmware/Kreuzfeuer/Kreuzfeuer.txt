@@ -1,4 +1,4 @@
 Kreuzfeuer
-by freaky-m0
+Autor: freaky-m0
 Inspiriert durch "Schiffe versenken". Die vier Spieler schießen mit einem Tastendruck auf die versteckten Schiffe. Bei einem Treffer werden diese sichtbar. Es gibt einen begrenzten, gemeinsamen Munitionsvorrat. Dieser wird durch die Farbe der vier Punkte in den Ecken dargestellt.
 
