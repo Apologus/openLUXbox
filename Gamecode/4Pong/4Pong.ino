@@ -47,22 +47,22 @@
 // STARTBILDSCHIRM - FEST INTEGRIERTER HEXCODE
 // ============================================================
 const uint32_t PROGMEM SCREEN_START[16][16] = {
-    {0x4F2189, 0x4E2189, 0x4F2189, 0x4F2089, 0x4F2189, 0x4F2089, 0x4F218A, 0x4F218A, 0x4F218A, 0x4F218A, 0x4F218A, 0x50218B, 0x50218B, 0xF4F13A, 0x532390, 0x5D26A2},
-    {0x50218B, 0x50218B, 0x50218B, 0x50218B, 0x50218B, 0x51218C, 0x50228D, 0x51228E, 0x51228E, 0x52228E, 0x532290, 0x542291, 0xF4F13A, 0xF4F13A, 0x5C26A0, 0x652AB0},
-    {0x50218B, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x522290, 0x532391, 0x532291, 0x542392, 0x552394, 0xF4F13A, 0x58259A, 0xF4F13A, 0x6028A7, 0x672BB2},
-    {0x50218B, 0x000000, 0x52228F, 0x522291, 0x532391, 0x000000, 0x000000, 0x552493, 0x552495, 0x572496, 0xF4F13A, 0x5A259B, 0x5C26A0, 0xF4F13A, 0x6229AB, 0x672AB3},
-    {0x50218B, 0x000000, 0x532392, 0x542392, 0x542393, 0x552394, 0x000000, 0x562497, 0x572498, 0xF4F13A, 0x5A259C, 0x5C26A0, 0x5D27A3, 0xF4F13A, 0x6329AD, 0x672BB4},
-    {0x50218B, 0x000000, 0x542393, 0x552394, 0x562396, 0x572396, 0x000000, 0x582499, 0x59259B, 0xF4F13A, 0xF4F13A, 0xF4F13A, 0xF4F13A, 0xF4F13A, 0xF4F13A, 0x672BB4},
-    {0x50218B, 0x000000, 0x562396, 0x562496, 0x572497, 0x000000, 0x000000, 0x5A259C, 0x5A259D, 0x5B269F, 0x5C26A2, 0x5E27A5, 0x6027A8, 0xF4F13A, 0x652AB1, 0x682BB5},
-    {0x50218B, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x59259B, 0x5A269E, 0x5B26A0, 0x5C26A1, 0x5E27A4, 0x6028A6, 0x6129AA, 0xF4F13A, 0x662AB1, 0x672BB5},
-    {0x50218B, 0x000000, 0x572499, 0x58259A, 0x59259A, 0x5A259C, 0x5A259D, 0x5C269F, 0x5C26A2, 0x5D26A4, 0x5F27A6, 0x6028A8, 0x6229AB, 0x642AAE, 0x662AB1, 0x682BB5},
-    {0x50218B, 0x000000, 0x58259A, 0x59259C, 0x000000, 0x000000, 0x5C269F, 0x5D26A1, 0x000000, 0x000000, 0x000000, 0x6228AA, 0x6229AD, 0x000000, 0x000000, 0x000000},
-    {0x50218B, 0x000000, 0x5A259C, 0x000000, 0x5B259E, 0x5C269F, 0x000000, 0x5E26A2, 0x000000, 0x5F28A6, 0x000000, 0x6228AB, 0x000000, 0x6529B0, 0x662AB2, 0x000000},
-    {0x50218B, 0x000000, 0x5A269D, 0x000000, 0x5C26A0, 0x5C26A1, 0x000000, 0x5E27A4, 0x000000, 0x6027A8, 0x000000, 0x6329AC, 0x000000, 0x652AB1, 0x672BB3, 0x000000},
-    {0x5A259C, 0x5A269E, 0x5B269E, 0x5B269F, 0x000000, 0x000000, 0x5E27A3, 0x5F27A5, 0x000000, 0x6028A9, 0x000000, 0x6329AC, 0x642AAE, 0x000000, 0x000000, 0x000000},
-    {0x5B259E, 0x5B259E, 0x5B259F, 0x5C27A0, 0x5D26A2, 0x5E26A3, 0x5E27A4, 0x5F28A6, 0x6028A7, 0x6128A9, 0x6229AB, 0x6329AD, 0x6429AF, 0x652AB2, 0x662AB3, 0x000000},
-    {0x5B269E, 0x5B269F, 0x5C26A0, 0x5D27A2, 0x5D27A3, 0x5E27A4, 0x5F28A5, 0x5F28A7, 0x6128A8, 0x6229AA, 0x6329AB, 0x642AAE, 0x642AAF, 0x000000, 0x000000, 0x682BB5},
-    {0x5C269F, 0x5C26A0, 0x5C26A1, 0x5D27A3, 0x5E27A3, 0x5F27A5, 0x5F27A6, 0x6028A7, 0x6128A9, 0x6228AA, 0x6329AC, 0x642AAE, 0x652AB0, 0x662AB2, 0x672BB4, 0x682BB5}
+    {0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x50FF50, 0x000000, 0x000000},
+    {0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x73FF50, 0x73FF50, 0x000000, 0x000000},
+    {0x000000, 0x96FF50, 0x96FF50, 0x96FF50, 0x96FF50, 0x96FF50, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x96FF50, 0x000000, 0x96FF50, 0x000000, 0x000000},
+    {0x000000, 0xB9FF50, 0x000000, 0x000000, 0x000000, 0xB9FF50, 0xB9FF50, 0x000000, 0x000000, 0x000000, 0xB9FF50, 0x000000, 0x000000, 0xB9FF50, 0x000000, 0x000000},
+    {0x000000, 0xDCFF50, 0x000000, 0x000000, 0x000000, 0x000000, 0xDCFF50, 0x000000, 0x000000, 0xDCFF50, 0x000000, 0x000000, 0x000000, 0xDCFF50, 0x000000, 0x000000},
+    {0x000000, 0xFFFF50, 0x000000, 0x000000, 0x000000, 0x000000, 0xFFFF50, 0x000000, 0x000000, 0xFFFF50, 0xFFFF50, 0xFFFF50, 0xFFFF50, 0xFFFF50, 0xFFFF50, 0x000000},
+    {0x000000, 0xECED73, 0x000000, 0x000000, 0x000000, 0xECED73, 0xECED73, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0xECED73, 0x000000, 0x000000},
+    {0x000000, 0xD9DC96, 0xD9DC96, 0xD9DC96, 0xD9DC96, 0xD9DC96, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0xD9DC96, 0x000000, 0x000000},
+    {0x000000, 0xC6CAB9, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000},
+    {0x000000, 0xB3B8DC, 0x000000, 0x000000, 0xB3B8DC, 0xB3B8DC, 0x000000, 0x000000, 0xB3B8DC, 0xB3B8DC, 0xB3B8DC, 0x000000, 0x000000, 0xB3B8DC, 0xB3B8DC, 0xB3B8DC},
+    {0x000000, 0xA0A0FF, 0x000000, 0xA0A0FF, 0x000000, 0x000000, 0xA0A0FF, 0x000000, 0xA0A0FF, 0x000000, 0xA0A0FF, 0x000000, 0xA0A0FF, 0x000000, 0x000000, 0xA0A0FF},
+    {0x000000, 0xB3B3FF, 0x000000, 0xB3B3FF, 0x000000, 0x000000, 0xB3B3FF, 0x000000, 0xB3B3FF, 0x000000, 0xB3B3FF, 0x000000, 0xB3B3FF, 0x000000, 0x000000, 0xB3B3FF},
+    {0x000000, 0x000000, 0x000000, 0x000000, 0xC6C6FF, 0xC6C6FF, 0x000000, 0x000000, 0xC6C6FF, 0x000000, 0xC6C6FF, 0x000000, 0x000000, 0xC6C6FF, 0xC6C6FF, 0xC6C6FF},
+    {0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0xD9D9FF},
+    {0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0xECECFF, 0xECECFF, 0x000000},
+    {0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000}
 };
 
 // ============================================================
@@ -95,8 +95,8 @@ void drawBall();
 int  xyToIndex(int x, int y);
 bool isOnPaddle(int x, int y, int &paddleId, int &half);
 void reflectBall(int paddleId, int half);
-void fillGameOverPixels();
-CRGB randomColor();
+void drawGameOverScore();
+CRGB getGradientColor(int y);
 
 // ============================================================
 // GLOBALE VARIABLEN
@@ -117,6 +117,7 @@ float ballSpeed;
 
 unsigned long lastSpeedUp;
 int score;
+unsigned long gameStartTime;
 
 enum GameState { STATE_START, STATE_PLAY, STATE_GAMEOVER };
 GameState gameState;
@@ -131,6 +132,28 @@ unsigned long lastFrameTime;
 
 // Verhindert sofortigen Start nach Boot
 bool startScreenJustShown = false;
+
+// 4x7 Ziffern Font (0-9)
+const uint8_t FONT_4x7[10][7] PROGMEM = {
+  {0b1110, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b1110}, // 0
+  {0b0100, 0b1100, 0b0100, 0b0100, 0b0100, 0b0100, 0b1110}, // 1
+  {0b1110, 0b0001, 0b0001, 0b1110, 0b1000, 0b1000, 0b1111}, // 2
+  {0b1110, 0b0001, 0b0001, 0b0110, 0b0001, 0b0001, 0b1110}, // 3
+  {0b1001, 0b1001, 0b1001, 0b1111, 0b0001, 0b0001, 0b0001}, // 4
+  {0b1111, 0b1000, 0b1000, 0b1110, 0b0001, 0b0001, 0b1110}, // 5
+  {0b0110, 0b1000, 0b1000, 0b1110, 0b1001, 0b1001, 0b0110}, // 6
+  {0b1111, 0b0001, 0b0010, 0b0100, 0b0100, 0b0100, 0b0100}, // 7
+  {0b0110, 0b1001, 0b1001, 0b0110, 0b1001, 0b1001, 0b0110}, // 8
+  {0b0110, 0b1001, 0b1001, 0b0111, 0b0001, 0b0001, 0b0110}  // 9
+};
+
+// 3x5 Font für "Sek." (S, e, k, .)
+const uint8_t FONT_SEK[4][5] PROGMEM = {
+  {0b111, 0b100, 0b111, 0b001, 0b111}, // S
+  {0b111, 0b101, 0b111, 0b100, 0b111}, // e
+  {0b101, 0b110, 0b100, 0b110, 0b101}, // k
+  {0b000, 0b000, 0b000, 0b000, 0b010}  // .
+};
 
 // ============================================================
 // SETUP
@@ -235,16 +258,20 @@ void loop() {
         clearMatrix();
         FastLED.show();
         gameOverScreenCleared = true;
+        lastSpeedUp = millis();  // Zeit speichern
         Serial.println("[GAMEOVER] Screen geleert, starte Score-Animation");
-      } else if (anyButtonPressed()) {
-        Serial.println("[GAMEOVER] Taste gedrückt -> Startbildschirm");
-        delay(2000);
-        showStartScreen();
-        gameState = STATE_START;
-        // Auch hier: Flag setzen damit kein Doppel-Trigger
-        startScreenJustShown = true;
+      } else if (millis() - lastSpeedUp > 4000) {  // 4 Sekunden warten
+        if (anyButtonPressed()) {
+          Serial.println("[GAMEOVER] Taste gedrückt -> Startbildschirm");
+          showStartScreen();
+          gameState = STATE_START;
+          startScreenJustShown = true;
+        } else {
+          drawGameOverScore();
+          FastLED.show();
+        }
       } else {
-        fillGameOverPixels();
+        drawGameOverScore();
         FastLED.show();
       }
       break;
@@ -309,6 +336,7 @@ void startGame() {
   ballY     = 7.5f;
   ballSpeed = BALL_START_SPEED;
   lastSpeedUp = millis();
+  gameStartTime = millis();
   score = 0;
   // Diagonaler Startwinkel, nie achsenparallel
   int baseAngles[] = {30, 60, 120, 150, 210, 240, 300, 330};
@@ -408,6 +436,7 @@ void updateBall(unsigned long delta_ms) {
   int ny = (int)round(newY);
 
   if (nx < 0 || nx >= MATRIX_W || ny < 0 || ny >= MATRIX_H) {
+    score = (millis() - gameStartTime) / 1000;
     Serial.print("[BALL] Rand erreicht bei (");
     Serial.print(nx); Serial.print("/"); Serial.print(ny);
     Serial.print(") -> Game Over | Score: ");
@@ -424,12 +453,10 @@ void updateBall(unsigned long delta_ms) {
   int paddleId, half;
   if (isOnPaddle(nx, ny, paddleId, half)) {
     reflectBall(paddleId, half);
-    score++;
     float rad2 = ballAngle * PI / 180.0f;
     ballX = nx + cos(rad2);
     ballY = ny + sin(rad2);
-    Serial.print("[BALL] Schläger getroffen! Score=");
-    Serial.println(score);
+    Serial.println("[BALL] Schläger getroffen!");
   } else {
     ballX = newX;
     ballY = newY;
@@ -551,39 +578,85 @@ void drawBall() {
 }
 
 // ============================================================
-// GAME OVER ANIMATION
+// GAME OVER ANIMATION & SCORE ANZEIGE
 // ============================================================
-CRGB randomColor() {
-  return CRGB(random(100, 255), random(100, 255), random(100, 255));
+CRGB getGradientColor(int y) {
+  // Verlauf der 4 Schlägerfarben von oben nach unten (y: 0 bis 15)
+  // Grün -> Gelb -> Blau -> Weiß
+  if (y <= 5) {
+    fract8 f = (y * 255) / 5;
+    return blend(COL_GREEN, COL_YELLOW, f);
+  } else if (y <= 10) {
+    fract8 f = ((y - 5) * 255) / 5;
+    return blend(COL_YELLOW, COL_BLUE, f);
+  } else {
+    fract8 f = ((y - 10) * 255) / 5;
+    return blend(COL_BLUE, COL_WHITE, f);
+  }
 }
 
-void fillGameOverPixels() {
-  gameOverAccum += GAMEOVER_SPEED / FPS;
-  int toFill = (int)gameOverAccum;
-  gameOverAccum -= toFill;
+void drawGameOverScore() {
+  clearMatrix();
 
-  for (int i = 0; i < toFill; i++) {
-    if (gameOverRound == 0 && gameOverPixels >= score) {
-      Serial.print("[GAMEOVER] Animation abgeschlossen, Score=");
-      Serial.println(score);
-      return;
+  char scoreStr[16];
+  itoa(score, scoreStr, 10);
+  int len = strlen(scoreStr);
+  int totalWidth = len * 4 + (len - 1); // 4px Breite pro Ziffer + 1px Abstand
+
+  int startX = 0;
+  int startY = 1; // Ziffern oben (Y: 1 bis 7)
+
+  if (totalWidth <= MATRIX_W) {
+    startX = (MATRIX_W - totalWidth) / 2; // Horizontal zentriert
+  } else {
+    // Wenn Score breiter als 16 Pixel ist: sanftes horizontales Scrollen
+    int scrollRange = totalWidth - MATRIX_W + 4;
+    int scrollPos = (millis() / 250) % (scrollRange * 2);
+    if (scrollPos >= scrollRange) {
+      scrollPos = scrollRange * 2 - scrollPos;
     }
-
-    int pixelInRound = gameOverPixels % NUM_LEDS;
-
-    if (pixelInRound == 0 && gameOverPixels > 0) {
-      gameOverRound++;
-      gameOverColor = randomColor();
-      Serial.print("[GAMEOVER] Neue Füllung, Runde=");
-      Serial.println(gameOverRound);
-    }
-
-    int x = pixelInRound % MATRIX_W;
-    int y = pixelInRound / MATRIX_W;
-    int idx = xyToIndex(x, y);
-    if (idx >= 0) leds[idx] = gameOverColor;
-
-    gameOverPixels++;
+    startX = 2 - scrollPos;
   }
-  delay(50);
+
+  // Ziffern zeichnen
+  for (int i = 0; i < len; i++) {
+    int digit = scoreStr[i] - '0';
+    int curX = startX + i * 5;
+
+    for (int row = 0; row < 7; row++) {
+      uint8_t rowData = pgm_read_byte(&FONT_4x7[digit][row]);
+      for (int col = 0; col < 4; col++) {
+        if (rowData & (1 << (3 - col))) {
+          // X-Achse gespiegelt korrigiert (Matrix X: MATRIX_W - 1 - px)
+          int px = MATRIX_W - 1 - (curX + col);
+          int py = startY + row;
+          if (px >= 0 && px < MATRIX_W && py >= 0 && py < MATRIX_H) {
+            int idx = xyToIndex(px, py);
+            if (idx >= 0) leds[idx] = getGradientColor(py);
+          }
+        }
+      }
+    }
+  }
+
+  // "Sek." unten zeichnen (Y: 10 bis 14)
+  int sekStartY = 10;
+  int sekStartX = 1; // Startet bei X=1, passt perfekt für "Sek." (13px breit)
+  for (int charIdx = 0; charIdx < 4; charIdx++) {
+    int curX = sekStartX + charIdx * 4;
+    for (int row = 0; row < 5; row++) {
+      uint8_t rowData = pgm_read_byte(&FONT_SEK[charIdx][row]);
+      for (int col = 0; col < 3; col++) {
+        if (rowData & (1 << (2 - col))) {
+          // X-Achse gespiegelt korrigiert
+          int px = MATRIX_W - 1 - (curX + col);
+          int py = sekStartY + row;
+          if (px >= 0 && px < MATRIX_W && py >= 0 && py < MATRIX_H) {
+            int idx = xyToIndex(px, py);
+            if (idx >= 0) leds[idx] = getGradientColor(py);
+          }
+        }
+      }
+    }
+  }
 }

@@ -10,6 +10,7 @@
 // 1. INCLUDES
 // ============================================================================
 #include <FastLED.h>
+#include "olb_init_v1.h"
 
 // ============================================================================
 // 2. DEFINES & KONSTANTEN
@@ -68,7 +69,6 @@ struct Button {
 // ============================================================================
 // 4. FUNKTIONSPROTOTYPEN
 // ============================================================================
-uint16_t olb_xy(uint8_t x, uint8_t y);
 void setPixel(int8_t x, int8_t y, CRGB color);
 void handleInput();
 void resetGame();
@@ -146,6 +146,9 @@ void setup() {
   FastLED.clear();
   FastLED.show();
 
+  // Startanimation
+  olb_v1_playIntro(leds);  
+
   // Echter Zufalls-Seed über unbeschalteten Analog-Pin A0
   randomSeed(analogRead(A0));
 
@@ -193,16 +196,6 @@ void loop() {
 // ============================================================================
 // 8. HILFS- & HARDWARE-FUNKTIONEN
 // ============================================================================
-
-// Koordinaten-Mapping (Serpentinen-Layout gemäß TSD)
-uint16_t olb_xy(uint8_t x, uint8_t y) {
-  if (x >= MATRIX_WIDTH || y >= MATRIX_HEIGHT) return 0;
-  if (y % 2 == 0) {
-    return y * MATRIX_WIDTH + (15 - x); // Gerade Zeilen: rechts -> links
-  } else {
-    return y * MATRIX_WIDTH + x;        // Ungerade Zeilen: links -> rechts
-  }
-}
 
 void setPixel(int8_t x, int8_t y, CRGB color) {
   if (x < 0 || x >= MATRIX_WIDTH || y < 0 || y >= MATRIX_HEIGHT) return;
