@@ -12,11 +12,19 @@
 CRGB leds[NUM_LEDS];
 
 // Pinbelegung der Buttons
-#define BUTTON_1 D5 // gelb
-#define BUTTON_2 D2 // grün
-#define BUTTON_3 D6 // blau
-#define BUTTON_4 D1 // weiß
-#define BUTTON_5 D7 // unbenutzt
+#if defined(ESP8266)
+    #define BUTTON_1 D5 // gelb
+    #define BUTTON_2 D2 // grün
+    #define BUTTON_3 D6 // blau
+    #define BUTTON_4 D1 // weiß
+    #define BUTTON_5 D7 // unbenutzt
+#elif defined(ESP32)
+    #define BUTTON_1 23 // gelb
+    #define BUTTON_2 19 // grün
+    #define BUTTON_3 18 // blau
+    #define BUTTON_4 26 // weiß
+    #define BUTTON_5 33 // unbenutzt
+#endif
 
 // Farben für die Buttons
 CRGB buttonColors[] = {

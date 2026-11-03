@@ -10,6 +10,15 @@
           "offset": 0
         }
       ]
+    },
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        {
+          "path": "4Pong_ESP32.bin",
+          "offset": 0
+        }
+      ]
     }
   ]
 }
