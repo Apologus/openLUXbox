@@ -1,14 +1,18 @@
 // NodeMCU 1.0 (ESP-12E Module) - Board: "NodeMCU 1.0 (ESP-12E Module)"
-// CanoLbalt - Co-op Runner gemäß GSD 
+// CanoLbalt - Co-op Runner gemäß GSD
 
-#include <user_interface.h>
 #include <FastLED.h>
+#if defined(ESP8266)
+    #include <ESP8266WiFi.h>
+#elif defined(ESP32)
+    #include <WiFi.h>
+#endif
 #include "olb_init_v1.h"
 
 // ============================================================================
 // 1. HARDWARE- UND PIN-DEFINITIONEN
 // ============================================================================
-#define PIN_LED           D4
+#define PIN_LED           2
 #define NUM_LEDS          256
 #define MATRIX_WIDTH      16
 #define MATRIX_HEIGHT     16
@@ -16,10 +20,17 @@
 #define CHIPSET           WS2812B
 #define GLOBAL_BRIGHTNESS 80 // ~20% Helligkeit gemäß GSD
 
-#define PIN_BTN_GELB      14 // GPIO 14 (D5) - Spieler 0 (GELB - LINKS)
-#define PIN_BTN_GRUEN     4  // GPIO 4  (D2) - Spieler 1 (GRÜN - RECHTS)
-#define PIN_BTN_WEISS     5  // GPIO 5  (D1) - Spieler 2 (WEISS - UNTEN)
-#define PIN_BTN_BLAU      12 // GPIO 12 (D6) - Spieler 3 (BLAU - HOCH/OBEN)
+#if defined(ESP8266)
+    #define PIN_BTN_GELB      14 // GPIO 14 (D5) - Spieler 0 (GELB - LINKS)
+    #define PIN_BTN_GRUEN     4  // GPIO 4  (D2) - Spieler 1 (GRÜN - RECHTS)
+    #define PIN_BTN_WEISS     5  // GPIO 5  (D1) - Spieler 2 (WEISS - UNTEN)
+    #define PIN_BTN_BLAU      12 // GPIO 12 (D6) - Spieler 3 (BLAU - HOCH/OBEN)
+#elif defined(ESP32)
+    #define PIN_BTN_GELB      23 // Spieler 0 (GELB - LINKS)
+    #define PIN_BTN_GRUEN     19 // Spieler 1 (GRÜN - RECHTS)
+    #define PIN_BTN_WEISS     26 // Spieler 2 (WEISS - UNTEN)
+    #define PIN_BTN_BLAU      18 // Spieler 3 (BLAU - HOCH/OBEN)
+#endif
 
 #define NUM_PLAYERS       4
 
@@ -150,8 +161,8 @@ struct Spalte {
 };
 
 struct BackgroundSpalte {
-  uint8_t hoeheY;  
-  CRGB farbe;      
+  uint8_t hoeheY;
+  CRGB farbe;
   uint16_t windowMask;
 };
 
@@ -248,10 +259,9 @@ void renderGameOverScreen(uint32_t now);
 // 6. SETUP & MAIN LOOP
 // ============================================================================
 void setup() {
-  wifi_set_opmode(NULL_MODE);
-  wifi_fpm_set_sleep_type(MODEM_SLEEP_T);
-  wifi_fpm_open();
-  wifi_fpm_do_sleep(0xFFFFFFF);
+    WiFi.mode(WIFI_OFF);
+    delay(100);
+    // KEIN wdtDisable() – kann Boot blockieren
 
   for (uint8_t i = 0; i < NUM_PLAYERS; i++) {
     pinMode(BUTTON_PINS[i], INPUT_PULLUP);
@@ -311,7 +321,7 @@ void initBackgroundSkyline() {
   uint8_t col = 0;
   while (col < BG_PATTERN_SIZE) {
     uint8_t hausBreite = random(3, 7);
-    uint8_t hausHoeheY = random(1, 7); 
+    uint8_t hausHoeheY = random(1, 7);
     uint8_t shade = random(10, 25);
     CRGB hausFarbe = CRGB(shade / 2, shade / 2, shade);
 
@@ -321,7 +331,7 @@ void initBackgroundSkyline() {
       bgSkyline[col].windowMask = 0;
       if (b % 2 == 0) {
         for (uint8_t y = hausHoeheY + 1; y <= 11; y += 2) {
-          if (random(100) < 25) { 
+          if (random(100) < 25) {
             bgSkyline[col].windowMask |= (1 << y);
           }
         }
@@ -331,7 +341,7 @@ void initBackgroundSkyline() {
 
     uint8_t luecke = random(1, 3);
     for (uint8_t l = 0; l < luecke && col < BG_PATTERN_SIZE; l++) {
-      bgSkyline[col].hoeheY = 16; 
+      bgSkyline[col].hoeheY = 16;
       bgSkyline[col].farbe = CRGB(0, 0, 0);
       bgSkyline[col].windowMask = 0;
       col++;
@@ -575,7 +585,7 @@ void updatePhysicsAndWorld(uint32_t now) {
   }
 
   scrollAccu += effectiveSpeed * (FRAME_DAUER_MS / 1000.0f);
-  bgScrollAccu += (effectiveSpeed * 0.25f) * (FRAME_DAUER_MS / 1000.0f); 
+  bgScrollAccu += (effectiveSpeed * 0.25f) * (FRAME_DAUER_MS / 1000.0f);
 
   while (scrollAccu >= 1.0f) {
     scrollAccu -= 1.0f;
@@ -588,7 +598,7 @@ void updatePhysicsAndWorld(uint32_t now) {
   }
 
   if (isJumping) {
-    bool duoHolding = (digitalRead(BUTTON_PINS[activeDuoPlayer1]) == LOW) || 
+    bool duoHolding = (digitalRead(BUTTON_PINS[activeDuoPlayer1]) == LOW) ||
                       (digitalRead(BUTTON_PINS[activeDuoPlayer2]) == LOW);
 
     if (!duoHolding && jumpFrame < 15) {
@@ -837,7 +847,7 @@ void renderGameScreen() {
       CRGB dachFarbeOben;
       CRGB dachFarbeUnten;
 
-      if (s.gefahr) { 
+      if (s.gefahr) {
         dachFarbeOben = COLOR_MISSILE;
         uint8_t patternStep = targetWeltSpalte % 3;
         dachFarbeUnten = (patternStep == 1) ? farbeDunkel : farbeHell;

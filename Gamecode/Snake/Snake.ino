@@ -16,12 +16,18 @@
 // 2. DEFINES & KONSTANTEN
 // ============================================================================
 // Hardware Pins
-#define PIN_LED_DATA          D4   // GPIO 2
-#define PIN_BTN_LEFT          D5   // GPIO 14 (Gelb - Links)
-#define PIN_BTN_RIGHT         D2   // GPIO 4  (Grün - Rechts)
-#define PIN_BTN_DOWN          D1   // GPIO 5  (Weiß - Unten)
-#define PIN_BTN_UP            D6   // GPIO 12 (Blau - Oben)
-
+#define PIN_LED_DATA          2
+#if defined(ESP8266)
+    #define PIN_BTN_LEFT          D5   // GPIO 14 (Gelb - Links)
+    #define PIN_BTN_RIGHT         D2   // GPIO 4  (Grün - Rechts)
+    #define PIN_BTN_DOWN          D1   // GPIO 5  (Weiß - Unten)
+    #define PIN_BTN_UP            D6   // GPIO 12 (Blau - Oben)
+#elif defined(ESP32)
+    #define PIN_BTN_LEFT          23   // Gelb - Links
+    #define PIN_BTN_RIGHT         19   // Grün - Rechts
+    #define PIN_BTN_DOWN          26   // Weiß - Unten
+    #define PIN_BTN_UP            18   // Blau - Oben
+#endif
 // Matrix Parameter
 #define MATRIX_WIDTH          16
 #define MATRIX_HEIGHT         16
@@ -147,7 +153,7 @@ void setup() {
   FastLED.show();
 
   // Startanimation
-  olb_v1_playIntro(leds);  
+  olb_v1_playIntro(leds);
 
   // Echter Zufalls-Seed über unbeschalteten Analog-Pin A0
   randomSeed(analogRead(A0));

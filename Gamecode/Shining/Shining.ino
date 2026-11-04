@@ -4,7 +4,11 @@
 // =============================================================================
 
 #include <FastLED.h>
-#include <ESP8266WiFi.h>
+#if defined(ESP8266)
+    #include <ESP8266WiFi.h>
+#elif defined(ESP32)
+    #include <WiFi.h>
+#endif
 #include "olb_init_v1.h"
 
 // =============================================================================
@@ -12,7 +16,7 @@
 // =============================================================================
 
 // Display-Hardware
-#define LED_PIN          D4
+#define LED_PIN          2
 #define MATRIX_WIDTH     16
 #define MATRIX_HEIGHT    16
 #define NUM_LEDS         (MATRIX_WIDTH * MATRIX_HEIGHT)
@@ -21,10 +25,17 @@
 #define MASTER_BRIGHTNESS 51   // ca. 20% von 255
 
 // Button-Pins (Pull-Up, Active LOW)
-#define BTN_PIN_LEFT     D5   // GPIO 14 (Gelb)
-#define BTN_PIN_RIGHT    D2   // GPIO 4  (Grün)
-#define BTN_PIN_DOWN     D1   // GPIO 5  (Weiß)
-#define BTN_PIN_UP       D6   // GPIO 12 (Blau)
+#if defined(ESP8266)
+    #define BTN_PIN_LEFT     D5   // GPIO 14 (Gelb)
+    #define BTN_PIN_RIGHT    D2   // GPIO 4  (Grün)
+    #define BTN_PIN_DOWN     D1   // GPIO 5  (Weiß)
+    #define BTN_PIN_UP       D6   // GPIO 12 (Blau)
+#elif defined(ESP32)
+    #define BTN_PIN_LEFT     23   // Gelb
+    #define BTN_PIN_RIGHT    19   // Grün
+    #define BTN_PIN_DOWN     26   // Weiß
+    #define BTN_PIN_UP       18   // Blau
+#endif
 
 #define DEBOUNCE_MS      30
 #define NUM_BUTTONS      4
@@ -119,7 +130,6 @@ struct ClusterPoint {
 // 4. FUNKTIONSPROTOTYPEN
 // =============================================================================
 
-uint16_t olb_xy(uint8_t x, uint8_t y);
 void initHardware();
 void resetGame();
 void respawnCenterCluster();
@@ -214,7 +224,7 @@ void setup() {
   initHardware();
 
   // Startanimation
-  olb_v1_playIntro(leds);  
+  olb_v1_playIntro(leds);
 
   currentState = STATE_TITLE;
 }
@@ -261,20 +271,9 @@ void loop() {
 // 7. HARDWARE & KOORDINATENMAPPING
 // =============================================================================
 
-uint16_t olb_xy(uint8_t x, uint8_t y) {
-  if (x >= MATRIX_WIDTH || y >= MATRIX_HEIGHT) return 0;
-  // Gemäß TSD: Serpentinen-Layout, Start oben rechts
-  if (y % 2 == 0) {
-    return (y * 16) + (15 - x); // Gerade Zeilen: rechts -> links
-  } else {
-    return (y * 16) + x;        // Ungerade Zeilen: links -> rechts
-  }
-}
-
 void initHardware() {
   Serial.begin(115200);
   WiFi.mode(WIFI_OFF);
-  WiFi.forceSleepBegin();
 
   // Echter Zufall über unbeschalteten Analog-Pin
   randomSeed(analogRead(A0) ^ millis());
@@ -371,7 +370,7 @@ void respawnCenterCluster() {
 // Spektakuläre Farbexplosion bei Game Over
 void triggerGameOverExplosion() {
   float maxRadius = 14.0f;
-  
+
   // 1. Schockwelle expandiert
   for (float r = 0.5f; r <= maxRadius; r += 0.85f) {
     FastLED.clear();
@@ -388,7 +387,7 @@ void triggerGameOverExplosion() {
           float angle = atan2(dy, dx) + 3.14159f; // 0 .. 2*PI
           uint8_t colorIdx = (uint8_t)(angle / (3.14159f * 0.5f)) % 4;
           CRGB col = BUTTON_COLORS[colorIdx];
-          
+
           leds[olb_xy(x, y)] = CRGB(col.r * intensity, col.g * intensity, col.b * intensity);
         }
       }
