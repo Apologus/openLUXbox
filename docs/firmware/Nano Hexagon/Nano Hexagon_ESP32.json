@@ -1,0 +1,15 @@
+{
+  "name": "Nano Hexagon",
+  "version": "1.0",
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        {
+          "path": "Nano Hexagon_ESP32.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}

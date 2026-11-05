@@ -1,0 +1,15 @@
+{
+  "name": "Frog",
+  "version": "1.0",
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        {
+          "path": "Frog_ESP32.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}
