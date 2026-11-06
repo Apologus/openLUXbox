@@ -14,10 +14,10 @@
     {
       "chipFamily": "ESP32",
       "parts": [
-        {
-          "path": "Kreuzfeuer_ESP32.bin",
-          "offset": 0
-        }
+        { "path": "Kreuzfeuer.ino.bootloader.bin", "offset": 4096 },
+        { "path": "Kreuzfeuer.ino.partitions.bin", "offset": 32768 },
+        { "path": "boot_app0.bin", "offset": 57344 },
+        { "path": "Kreuzfeuer_ESP32.bin", "offset": 65536 }
       ]
     }
   ]
