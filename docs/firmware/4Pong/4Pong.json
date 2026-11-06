@@ -14,10 +14,10 @@
     {
       "chipFamily": "ESP32",
       "parts": [
-        {
-          "path": "4Pong_ESP32.bin",
-          "offset": 0
-        }
+        { "path": "4Pong.ino.bootloader.bin", "offset": 4096 },
+        { "path": "4Pong.ino.partitions.bin", "offset": 32768 },
+        { "path": "boot_app0.bin", "offset": 57344 },
+        { "path": "4Pong_ESP32.bin", "offset": 65536 }
       ]
     }
   ]
