@@ -1,4 +1,4 @@
-## Teileliste
+## Teileliste für Gehäuse v2 (mit Platine)
 
 Die Links sind *keine* affiliate links. Nachdem AZ-Delivery leider Konkurs angemeldet hat, stammen alle Links von Amazon.
 
