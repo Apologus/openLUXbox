@@ -6,7 +6,7 @@
       "chipFamily": "ESP8266",
       "parts": [
         {
-          "path": "MazeRace.ino.bin",
+          "path": "MazeRace.bin",
           "offset": 0
         }
       ]
