@@ -1,0 +1,15 @@
+{
+  "name": "MazeRace",
+  "version": "1.0",
+  "builds": [
+    {
+      "chipFamily": "ESP8266",
+      "parts": [
+        {
+          "path": "MazeRace.ino.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}
