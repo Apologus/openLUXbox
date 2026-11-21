@@ -12,18 +12,14 @@
    INCLUDES
    --------------------------------------------------------------------------- */
 #include <FastLED.h>
-#if defined(ESP8266)
-    #include <ESP8266WiFi.h>
-#elif defined(ESP32)
-    #include <WiFi.h>
-#endif
+#include <ESP8266WiFi.h>
 
 /* ---------------------------------------------------------------------------
    DEFINES / KONSTANTEN
    --------------------------------------------------------------------------- */
 
 /* --- Display / System --- */
-#define OLB_LED_PIN              2
+#define OLB_LED_PIN              D4
 #define OLB_MATRIX_W             16
 #define OLB_MATRIX_H             16
 #define OLB_NUM_LEDS             256
@@ -37,20 +33,12 @@
 #define OLB_SEA_SIZE             14
 
 /* --- Taster (GPIO) --- */
-#if defined(ESP8266)
-    #define OLB_BTN_GREEN            4       /* D2 - rechte Bahn, feuert nach links  */
-    #define OLB_BTN_YELLOW           14      /* D5 - linke  Bahn, feuert nach rechts */
-    #define OLB_BTN_WHITE            5       /* D1 - untere Bahn, feuert nach oben   */
-    #define OLB_BTN_BLUE             12      /* D6 - obere  Bahn, feuert nach unten  */
-    #define OLB_SEED_PIN             A0      /* unbeschaltet */
-#elif defined(ESP32)
-    #define OLB_BTN_GREEN            19      /* rechte Bahn, feuert nach links  */
-    #define OLB_BTN_YELLOW           23      /* linke  Bahn, feuert nach rechts */
-    #define OLB_BTN_WHITE            26      /* untere Bahn, feuert nach oben   */
-    #define OLB_BTN_BLUE             18      /* obere  Bahn, feuert nach unten  */
-    #define OLB_SEED_PIN             33      /* unbeschaltet */
-#endif
+#define OLB_BTN_GREEN            4       /* D2 - rechte Bahn, feuert nach links  */
+#define OLB_BTN_YELLOW           14      /* D5 - linke  Bahn, feuert nach rechts */
+#define OLB_BTN_WHITE            5       /* D1 - untere Bahn, feuert nach oben   */
+#define OLB_BTN_BLUE             12      /* D6 - obere  Bahn, feuert nach unten  */
 #define OLB_DEBOUNCE_MS          30
+#define OLB_SEED_PIN             A0      /* unbeschaltet */
 
 /* --- Geschuetze --- */
 #define OLB_CANNON_STEP_MS_BASE  200
@@ -349,6 +337,7 @@ void setup() {
 
   /* WLAN abschalten. Das delay(1) ist noetig, damit der SDK-Sleep greift. */
   WiFi.mode(WIFI_OFF);
+  WiFi.forceSleepBegin();
   delay(1);
 
   /* Hinweis zum Watchdog:

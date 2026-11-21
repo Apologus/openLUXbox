@@ -4,11 +4,7 @@
 // =============================================================================
 
 #include <FastLED.h>
-#if defined(ESP8266)
-    #include <ESP8266WiFi.h>
-#elif defined(ESP32)
-    #include <WiFi.h>
-#endif
+#include <ESP8266WiFi.h>
 #include "olb_init_v1.h"
 
 // =============================================================================
@@ -16,7 +12,7 @@
 // =============================================================================
 
 // Display-Hardware
-#define LED_PIN          2
+#define LED_PIN          D4
 #define MATRIX_WIDTH     16
 #define MATRIX_HEIGHT    16
 #define NUM_LEDS         (MATRIX_WIDTH * MATRIX_HEIGHT)
@@ -25,17 +21,10 @@
 #define MASTER_BRIGHTNESS 51   // ca. 20% von 255
 
 // Button-Pins (Pull-Up, Active LOW)
-#if defined(ESP8266)
-    #define BTN_PIN_LEFT     D5   // GPIO 14 (Gelb)
-    #define BTN_PIN_RIGHT    D2   // GPIO 4  (Grün)
-    #define BTN_PIN_DOWN     D1   // GPIO 5  (Weiß)
-    #define BTN_PIN_UP       D6   // GPIO 12 (Blau)
-#elif defined(ESP32)
-    #define BTN_PIN_LEFT     23   // Gelb
-    #define BTN_PIN_RIGHT    19   // Grün
-    #define BTN_PIN_DOWN     26   // Weiß
-    #define BTN_PIN_UP       18   // Blau
-#endif
+#define BTN_PIN_LEFT     D5   // GPIO 14 (Gelb)
+#define BTN_PIN_RIGHT    D2   // GPIO 4  (Grün)
+#define BTN_PIN_DOWN     D1   // GPIO 5  (Weiß)
+#define BTN_PIN_UP       D6   // GPIO 12 (Blau)
 
 #define DEBOUNCE_MS      30
 #define NUM_BUTTONS      4
@@ -130,6 +119,7 @@ struct ClusterPoint {
 // 4. FUNKTIONSPROTOTYPEN
 // =============================================================================
 
+uint16_t shining_xy(uint8_t x, uint8_t y);
 void initHardware();
 void resetGame();
 void respawnCenterCluster();
@@ -213,7 +203,7 @@ void drawChar3x5(const uint8_t fontChar[5], int8_t startX, int8_t startY, CRGB c
         int8_t px = startX + c;
         int8_t py = startY + r;
         if (px >= 0 && px < MATRIX_WIDTH && py >= 0 && py < MATRIX_HEIGHT) {
-          leds[olb_xy(px, py)] = col;
+          leds[shining_xy(px, py)] = col;
         }
       }
     }
@@ -224,7 +214,7 @@ void setup() {
   initHardware();
 
   // Startanimation
-  olb_v1_playIntro(leds);
+  olb_v1_playIntro(leds);  
 
   currentState = STATE_TITLE;
 }
@@ -271,9 +261,20 @@ void loop() {
 // 7. HARDWARE & KOORDINATENMAPPING
 // =============================================================================
 
+uint16_t shining_xy(uint8_t x, uint8_t y) {
+  if (x >= MATRIX_WIDTH || y >= MATRIX_HEIGHT) return 0;
+  // Gemäß TSD: Serpentinen-Layout, Start oben rechts
+  if (y % 2 == 0) {
+    return (y * 16) + (15 - x); // Gerade Zeilen: rechts -> links
+  } else {
+    return (y * 16) + x;        // Ungerade Zeilen: links -> rechts
+  }
+}
+
 void initHardware() {
   Serial.begin(115200);
   WiFi.mode(WIFI_OFF);
+  WiFi.forceSleepBegin();
 
   // Echter Zufall über unbeschalteten Analog-Pin
   randomSeed(analogRead(A0) ^ millis());
@@ -370,7 +371,7 @@ void respawnCenterCluster() {
 // Spektakuläre Farbexplosion bei Game Over
 void triggerGameOverExplosion() {
   float maxRadius = 14.0f;
-
+  
   // 1. Schockwelle expandiert
   for (float r = 0.5f; r <= maxRadius; r += 0.85f) {
     FastLED.clear();
@@ -387,8 +388,8 @@ void triggerGameOverExplosion() {
           float angle = atan2(dy, dx) + 3.14159f; // 0 .. 2*PI
           uint8_t colorIdx = (uint8_t)(angle / (3.14159f * 0.5f)) % 4;
           CRGB col = BUTTON_COLORS[colorIdx];
-
-          leds[olb_xy(x, y)] = CRGB(col.r * intensity, col.g * intensity, col.b * intensity);
+          
+          leds[shining_xy(x, y)] = CRGB(col.r * intensity, col.g * intensity, col.b * intensity);
         }
       }
     }
@@ -396,7 +397,7 @@ void triggerGameOverExplosion() {
     for (uint8_t s = 0; s < 5; s++) {
       uint8_t sx = random(MATRIX_WIDTH);
       uint8_t sy = random(MATRIX_HEIGHT);
-      leds[olb_xy(sx, sy)] = BUTTON_COLORS[random(4)];
+      leds[shining_xy(sx, sy)] = BUTTON_COLORS[random(4)];
     }
     FastLED.show();
     delay(28);
@@ -730,7 +731,7 @@ void renderWabern() {
       if (neighborCount > 0) {
         // Mischfarbe berechnen
         CRGB mixed = CRGB(r / neighborCount, g / neighborCount, b / neighborCount);
-        leds[olb_xy(x, y)] = CRGB(mixed.r * factor, mixed.g * factor, mixed.b * factor);
+        leds[shining_xy(x, y)] = CRGB(mixed.r * factor, mixed.g * factor, mixed.b * factor);
       }
     }
   }
@@ -740,7 +741,7 @@ void renderCluster() {
   for (uint16_t i = 0; i < clusterCount; i++) {
     int8_t x = cluster[i].x;
     int8_t y = cluster[i].y;
-    leds[olb_xy(x, y)] = BUTTON_COLORS[cluster[i].colorIdx];
+    leds[shining_xy(x, y)] = BUTTON_COLORS[cluster[i].colorIdx];
   }
 }
 
@@ -750,7 +751,7 @@ void renderShots() {
       int8_t sx = (int8_t)round(shots[i].x);
       int8_t sy = (int8_t)round(shots[i].y);
       if (sx >= 0 && sx < MATRIX_WIDTH && sy >= 0 && sy < MATRIX_HEIGHT) {
-        leds[olb_xy(sx, sy)] = BUTTON_COLORS[shots[i].colorIdx];
+        leds[shining_xy(sx, sy)] = BUTTON_COLORS[shots[i].colorIdx];
       }
     }
   }
@@ -779,7 +780,7 @@ void renderCannons() {
       }
     }
 
-    leds[olb_xy(cx, cy)] = c;
+    leds[shining_xy(cx, cy)] = c;
   }
 }
 
@@ -817,7 +818,7 @@ void renderTitleScreen() {
       }
 
       // Hintergrund etwas sanfter/dunkler, damit die Schrift klar lesbar ist
-      leds[olb_xy(x, y)] = CRGB(
+      leds[shining_xy(x, y)] = CRGB(
         baseColor.r * (brightness * 0.22f),
         baseColor.g * (brightness * 0.22f),
         baseColor.b * (brightness * 0.22f)
@@ -829,16 +830,16 @@ void renderTitleScreen() {
   float coreBreath = (sin(now * 0.008f) + 1.0f) * 0.5f;
   float coreIntensity = 0.5f + (coreBreath * 0.5f);
   uint8_t shift = (now / 400) % 4;
-  leds[olb_xy(7, 7)] = CRGB(BUTTON_COLORS[shift].r * coreIntensity,
+  leds[shining_xy(7, 7)] = CRGB(BUTTON_COLORS[shift].r * coreIntensity,
                             BUTTON_COLORS[shift].g * coreIntensity,
                             BUTTON_COLORS[shift].b * coreIntensity);
-  leds[olb_xy(8, 7)] = CRGB(BUTTON_COLORS[(shift + 1) % 4].r * coreIntensity,
+  leds[shining_xy(8, 7)] = CRGB(BUTTON_COLORS[(shift + 1) % 4].r * coreIntensity,
                             BUTTON_COLORS[(shift + 1) % 4].g * coreIntensity,
                             BUTTON_COLORS[(shift + 1) % 4].b * coreIntensity);
-  leds[olb_xy(8, 8)] = CRGB(BUTTON_COLORS[(shift + 2) % 4].r * coreIntensity,
+  leds[shining_xy(8, 8)] = CRGB(BUTTON_COLORS[(shift + 2) % 4].r * coreIntensity,
                             BUTTON_COLORS[(shift + 2) % 4].g * coreIntensity,
                             BUTTON_COLORS[(shift + 2) % 4].b * coreIntensity);
-  leds[olb_xy(7, 8)] = CRGB(BUTTON_COLORS[(shift + 3) % 4].r * coreIntensity,
+  leds[shining_xy(7, 8)] = CRGB(BUTTON_COLORS[(shift + 3) % 4].r * coreIntensity,
                             BUTTON_COLORS[(shift + 3) % 4].g * coreIntensity,
                             BUTTON_COLORS[(shift + 3) % 4].b * coreIntensity);
 
@@ -868,7 +869,7 @@ void renderTitleScreen() {
   if (random8() < 60) {
     uint8_t sparkX = 1 + random8(14);
     uint8_t sparkY = 1 + random8(14);
-    leds[olb_xy(sparkX, sparkY)] += CRGB(200, 200, 255);
+    leds[shining_xy(sparkX, sparkY)] += CRGB(200, 200, 255);
   }
 }
 
@@ -911,7 +912,7 @@ void drawDigit3x5(uint8_t digit, int8_t startX, int8_t startY) {
         int8_t px = startX + c;
         int8_t py = startY + r;
         if (px >= 0 && px < MATRIX_WIDTH && py >= 0 && py < MATRIX_HEIGHT) {
-          leds[olb_xy(px, py)] = getDiagonalGradient(px, py);
+          leds[shining_xy(px, py)] = getDiagonalGradient(px, py);
         }
       }
     }

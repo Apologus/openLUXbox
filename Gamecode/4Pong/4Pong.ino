@@ -2,36 +2,22 @@
 // 4Pong - openLUXbox
 
 #include <FastLED.h>
-#if defined(ESP8266)
-    #include <ESP8266WiFi.h>
-#elif defined(ESP32)
-    #include <WiFi.h>
-#endif
-
+#include <ESP8266WiFi.h>
 #include "olb_init_v1.h"
 
 // ============================================================
 // DEFINES / PARAMETER
 // ============================================================
-#define LED_PIN        2
+#define LED_PIN        D4
 #define NUM_LEDS       256
 #define MATRIX_W       16
 #define MATRIX_H       16
 #define BRIGHTNESS     51   // 20% von 255
 
-#if defined(ESP8266)
-    #define BTN_LEFT       4    // D2 grün
-    #define BTN_RIGHT      14   // D5 gelb
-    #define BTN_DOWN       5    // D1 weiß
-    #define BTN_UP         12   // D6 blau
-    #define SEEDPIN        D3
-#elif defined(ESP32)
-    #define BTN_LEFT       19   // grün
-    #define BTN_RIGHT      23   // gelb
-    #define BTN_DOWN       26   // weiß
-    #define BTN_UP         18   // blau
-    #define SEEDPIN        33
-#endif
+#define BTN_LEFT       4    // D2 grün
+#define BTN_RIGHT      14   // D5 gelb
+#define BTN_DOWN       5    // D1 weiß
+#define BTN_UP         12   // D6 blau
 
 #define FPS            30
 #define FRAME_MS       (1000 / FPS)
@@ -178,6 +164,7 @@ void setup() {
   Serial.println("[4Pong] Setup gestartet");
 
   WiFi.mode(WIFI_OFF);
+  WiFi.forceSleepBegin();
   delay(100);
   // KEIN wdtDisable() – kann Boot blockieren
 
@@ -185,7 +172,7 @@ void setup() {
   pinMode(BTN_RIGHT, INPUT_PULLUP);
   pinMode(BTN_DOWN,  INPUT_PULLUP);
   pinMode(BTN_UP,    INPUT_PULLUP);
-  pinMode(SEEDPIN, INPUT);
+  pinMode(D3, INPUT);
 
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
 
@@ -201,7 +188,7 @@ void setup() {
     delay(1);
   }
   for (int i = 0; i < 16; i++) {
-    seed ^= (uint32_t)digitalRead(SEEDPIN) << i;
+    seed ^= (uint32_t)digitalRead(D3) << i;
   }
   randomSeed(seed);
   Serial.print("[4Pong] Random Seed: ");

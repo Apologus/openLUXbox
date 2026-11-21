@@ -12,24 +12,17 @@
 #define MATRIX_W 16
 #define MATRIX_H 16
 #define NUM_LEDS 256
-#define DATA_PIN 2
+#define DATA_PIN D4
 #define BRIGHTNESS 51   // 20% gem. TSD
 
 #define COLOR_PLAYER CRGB::Green
 #define COLOR_BAR    CRGB::Red
 #define COLOR_SCORE  CRGB(0, 40, 0)   // Dunkelgrün
 
-#if defined(ESP8266)
-    #define BTN_LEFT  D5    // GPIO 14 (Gelb)
-    #define BTN_RIGHT D2    // GPIO 4  (Grün)
-    #define BTN_DOWN  D1    // GPIO 5  (Weiß)
-    #define BTN_UP    D6    // GPIO 12 (Blau)
-#elif defined(ESP32)
-    #define BTN_LEFT  23    // Gelb
-    #define BTN_RIGHT 19    // Grün
-    #define BTN_DOWN  26    // Weiß
-    #define BTN_UP    18    // Blau
-#endif
+#define BTN_LEFT  D5    // GPIO 14 (Gelb)
+#define BTN_RIGHT D2    // GPIO 4  (Grün)
+#define BTN_DOWN  D1    // GPIO 5  (Weiß)
+#define BTN_UP    D6    // GPIO 12 (Blau)
 
 #define DEBOUNCE_TIME 30
 
@@ -94,7 +87,7 @@ void startExplosion();
 
 CRGB leds[NUM_LEDS];
 Button btns[4];
-Bar hbars[4];
+Bar bars[4];
 Particle parts[10];
 
 int playerX = 7, playerY = 7;
@@ -308,12 +301,12 @@ void startGame() {
   lastMove = millis();
 
   for (int i = 0; i < 4; i++) {
-    hbars[i].dir = i;
-    hbars[i].active = (i == 0);
-    hbars[i].pos = 0;
-    hbars[i].width = random(BAR_MIN, BAR_MAX + 1);
-    hbars[i].offset = random(0, 16 - hbars[i].width);
-    hbars[i].startTime = gameStart + (i * BAR_DELAY);
+    bars[i].dir = i;
+    bars[i].active = (i == 0);
+    bars[i].pos = 0;
+    bars[i].width = random(BAR_MIN, BAR_MAX + 1);
+    bars[i].offset = random(0, 16 - bars[i].width);
+    bars[i].startTime = gameStart + (i * BAR_DELAY);
   }
 
   state = PLAY;
@@ -372,19 +365,19 @@ void updateBars() {
   lastMove = millis();
 
   for (int i = 0; i < 4; i++) {
-    if (!hbars[i].active) {
-      if (millis() > hbars[i].startTime)
-        hbars[i].active = true;
+    if (!bars[i].active) {
+      if (millis() > bars[i].startTime)
+        bars[i].active = true;
       else
         continue;
     }
 
-    hbars[i].pos++;
+    bars[i].pos++;
 
-    if (hbars[i].pos > 15) {
-      hbars[i].pos = 0;
-      hbars[i].width = random(BAR_MIN, BAR_MAX + 1);
-      hbars[i].offset = random(0, 16 - hbars[i].width);
+    if (bars[i].pos > 15) {
+      bars[i].pos = 0;
+      bars[i].width = random(BAR_MIN, BAR_MAX + 1);
+      bars[i].offset = random(0, 16 - bars[i].width);
     }
   }
 }
@@ -402,15 +395,15 @@ void drawGame() {
   unsigned long now = millis();
 
   for (int i = 0; i < 4; i++) {
-    if (!hbars[i].active) continue;
+    if (!bars[i].active) continue;
 
-    for (int w = 0; w < hbars[i].width; w++) {
+    for (int w = 0; w < bars[i].width; w++) {
       int x, y;
 
-      if (hbars[i].dir == 0) { x = hbars[i].offset + w; y = hbars[i].pos; }
-      if (hbars[i].dir == 1) { x = hbars[i].offset + w; y = 15 - hbars[i].pos; }
-      if (hbars[i].dir == 2) { x = hbars[i].pos; y = hbars[i].offset + w; }
-      if (hbars[i].dir == 3) { x = 15 - hbars[i].pos; y = hbars[i].offset + w; }
+      if (bars[i].dir == 0) { x = bars[i].offset + w; y = bars[i].pos; }
+      if (bars[i].dir == 1) { x = bars[i].offset + w; y = 15 - bars[i].pos; }
+      if (bars[i].dir == 2) { x = bars[i].pos; y = bars[i].offset + w; }
+      if (bars[i].dir == 3) { x = 15 - bars[i].pos; y = bars[i].offset + w; }
 
       // Flammen-/Wabereffekt:
       // Moduliert Helligkeit & Rot/Orange-Nuance basierend auf Zeit und Pixel-Position
@@ -430,15 +423,15 @@ void drawGame() {
 
 bool checkCollision() {
   for (int i = 0; i < 4; i++) {
-    if (!hbars[i].active) continue;
+    if (!bars[i].active) continue;
 
-    for (int w = 0; w < hbars[i].width; w++) {
+    for (int w = 0; w < bars[i].width; w++) {
       int bx, by;
 
-      if (hbars[i].dir == 0) { bx = hbars[i].offset + w; by = hbars[i].pos; }
-      if (hbars[i].dir == 1) { bx = hbars[i].offset + w; by = 15 - hbars[i].pos; }
-      if (hbars[i].dir == 2) { bx = hbars[i].pos; by = hbars[i].offset + w; }
-      if (hbars[i].dir == 3) { bx = 15 - hbars[i].pos; by = hbars[i].offset + w; }
+      if (bars[i].dir == 0) { bx = bars[i].offset + w; by = bars[i].pos; }
+      if (bars[i].dir == 1) { bx = bars[i].offset + w; by = 15 - bars[i].pos; }
+      if (bars[i].dir == 2) { bx = bars[i].pos; by = bars[i].offset + w; }
+      if (bars[i].dir == 3) { bx = 15 - bars[i].pos; by = bars[i].offset + w; }
 
       if (bx == playerX && by == playerY)
         return true;

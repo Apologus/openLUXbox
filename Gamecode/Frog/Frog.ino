@@ -1,30 +1,19 @@
 // NodeMCU 1.0 (ESP-12E Module)
 #include <FastLED.h>
-#if defined(ESP8266)
-    #include <ESP8266WiFi.h>
-#elif defined(ESP32)
-    #include <WiFi.h>
-#endif
+#include <ESP8266WiFi.h>
 #include "olb_init_v1.h"
 
 // ── Defines ──────────────────────────────────────────────
-#define LED_PIN        2
+#define LED_PIN        D4
 #define NUM_LEDS       256
 #define MATRIX_W       16
 #define MATRIX_H       16
 #define BRIGHTNESS     51
 
-#if defined(ESP8266)
-    #define BTN_LEFT       D2
-    #define BTN_RIGHT      D5
-    #define BTN_DOWN       D1
-    #define BTN_UP         D6
-#elif defined(ESP32)
-    #define BTN_LEFT       19
-    #define BTN_RIGHT      23
-    #define BTN_DOWN       26
-    #define BTN_UP         18
-#endif
+#define BTN_LEFT       D2
+#define BTN_RIGHT      D5
+#define BTN_DOWN       D1
+#define BTN_UP         D6
 
 #define DEBOUNCE_MS    30
 
@@ -245,6 +234,7 @@ void setup() {
   Serial.println("openLUXbox Frogger startet...");
 
   WiFi.mode(WIFI_OFF);
+  WiFi.forceSleepBegin();
 
   pinMode(BTN_LEFT,  INPUT_PULLUP);
   pinMode(BTN_RIGHT, INPUT_PULLUP);
