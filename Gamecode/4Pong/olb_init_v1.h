@@ -92,14 +92,13 @@ static const uint32_t OLB_FRAME_BOX[256] PROGMEM = {
 // ---------------------------------------------------------------------------
 
 // Wandelt Serpentinen-Koordinate (x,y) in LED-Index um
-static inline uint16_t olb_xy(uint8_t x, uint8_t y) {
+static inline uint16_t olb_init_xy(uint8_t x, uint8_t y) {
   if (y % 2 == 0) {
     return y * OLB_INIT_MATRIX_W + (OLB_INIT_MATRIX_W - 1 - x); // gerade: rechts→links
   } else {
     return y * OLB_INIT_MATRIX_W + x;                             // ungerade: links→rechts
   }
 }
-
 
 // Setzt eine komplette Zeile aus einem PROGMEM-Frame mit gegebenem Helligkeitsfaktor (0..255)
 // bright: 255 = volle Farbe, 128 = halbe Farbe
@@ -113,14 +112,14 @@ static void olb_setRow(CRGB* leds, const uint32_t* frame, uint8_t row, uint8_t b
     r = (uint8_t)((uint16_t)r * bright / 255);
     g = (uint8_t)((uint16_t)g * bright / 255);
     b = (uint8_t)((uint16_t)b * bright / 255);
-    leds[olb_xy(x, row)] = CRGB(r, g, b);
+    leds[olb_init_xy(x, row)] = CRGB(r, g, b);
   }
 }
 
 // Löscht eine komplette Zeile
 static void olb_clearRow(CRGB* leds, uint8_t row) {
   for (uint8_t x = 0; x < OLB_INIT_MATRIX_W; x++) {
-    leds[olb_xy(x, row)] = CRGB::Black;
+    leds[olb_init_xy(x, row)] = CRGB::Black;
   }
 }
 
@@ -225,4 +224,3 @@ static void olb_v1_playIntro(CRGB* leds) {
 }
 
 #endif // OLB_INIT_H
-
