@@ -1,0 +1,17 @@
+LEDris
+
+Eine kooperative Tetris-Variante auf der openLUXbox.
+
+Bedienung
+- D5 (links): Stein nach links bewegen
+- D2 (rechts): Stein nach rechts bewegen
+- D6 (oben): Stein drehen
+- D1 (unten): Fallgeschwindigkeit vorübergehend verringern
+
+Punkte und Schwierigkeit
+Vollständige Reihen werden blinkend gelöscht. Dafür gibt es Punkte: 100, 300, 500 oder 800 – je nachdem, wie viele Reihen gleichzeitig entfernt werden. Die Punkte werden mit dem aktuellen Level multipliziert.
+Alle vier gelöschten Reihen steigt das Level. Mit jedem Level fallen die Steine schneller. Die Bremse verlangsamt den Stein; danach zieht die Schwerkraft das Tempo schrittweise wieder an. Das Spiel endet, wenn kein neuer Stein mehr eingesetzt werden kann.
+
+Anzeigen
+- Linker Seitenbalken: Punktestand; zunächst Hunderter, dann Tausender, ...
+- Rechter Seitenbalken: Level.
